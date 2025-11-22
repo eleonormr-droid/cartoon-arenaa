@@ -1,0 +1,1923 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <title>Cartoon Clash Arena - Nouvelle Interface + Godmode</title>
+  <style>
+    * { box-sizing: border-box; }
+
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      background:
+        radial-gradient(circle at top left, #ffe082 0, transparent 55%),
+        radial-gradient(circle at top right, #a5b4fc 0, transparent 55%),
+        radial-gradient(circle at bottom, #6ee7b7 0, #0f172a 80%);
+      color: #0f172a;
+    }
+
+    .app-shell {
+      width: 100%;
+      max-width: 1120px;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .topbar {
+      padding: 10px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      backdrop-filter: blur(10px);
+      background: rgba(15,23,42,0.85);
+      color: #f9fafb;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.35);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    .topbar-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .logo-pill {
+      width: 44px;
+      height: 44px;
+      border-radius: 999px;
+      background: conic-gradient(from 180deg, #f97316, #facc15, #22c55e, #3b82f6, #f97316);
+      padding: 2px;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.35);
+    }
+
+    .logo-pill-inner {
+      width: 100%;
+      height: 100%;
+      border-radius: inherit;
+      background: radial-gradient(circle at 30% 0, #ffffff 0, #e5e7eb 30%, #0f172a 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 900;
+      font-size: 22px;
+      color: #111827;
+    }
+
+    .topbar-title h1 {
+      margin: 0;
+      font-size: 20px;
+    }
+
+    .topbar-title div {
+      font-size: 12px;
+      color: #e5e7eb;
+    }
+
+    .topbar-right {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 11px;
+    }
+
+    .chip {
+      padding: 2px 8px;
+      border-radius: 999px;
+      border: 1px solid rgba(148,163,184,0.7);
+      background: rgba(15,23,42,0.7);
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .chip span { display: block; }
+
+    .page {
+      flex: 1;
+      padding: 14px 16px 18px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .main-layout {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .col-left { flex: 1 1 360px; min-width: 340px; }
+    .col-right { flex: 1 1 340px; min-width: 320px; }
+
+    .card {
+      background: rgba(248,250,252,0.94);
+      border-radius: 18px;
+      padding: 12px 14px;
+      margin-bottom: 10px;
+      box-shadow: 0 4px 14px rgba(15,23,42,0.15);
+      border: 1px solid rgba(148,163,184,0.55);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background: radial-gradient(circle at top left, rgba(255,255,255,0.7) 0, transparent 60%);
+      opacity: 0.7;
+    }
+
+    .card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 6px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .card-header h2 {
+      margin: 0;
+      font-size: 15px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .card-header h2 span.icon {
+      font-size: 16px;
+    }
+
+    .card-header-tag {
+      font-size: 11px;
+      padding: 2px 8px;
+      border-radius: 999px;
+      background: #e5e7eb;
+      color: #4b5563;
+      border: 1px solid #cbd5f5;
+    }
+
+    .card-body {
+      position: relative;
+      z-index: 1;
+      font-size: 13px;
+    }
+
+    button {
+      border: none;
+      padding: 7px 12px;
+      border-radius: 999px;
+      cursor: pointer;
+      font-weight: 600;
+      margin: 4px 4px 0 0;
+      background: linear-gradient(135deg,#f97316,#facc15);
+      color: #111827;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.18);
+      transition: transform 0.05s ease, box-shadow 0.1s ease, filter 0.1s ease;
+      font-size: 12px;
+    }
+
+    button.secondary {
+      background: linear-gradient(135deg,#38bdf8,#0ea5e9);
+      color: #0b1020;
+    }
+
+    button.danger {
+      background: linear-gradient(135deg,#ef4444,#f97316);
+      color: #fff;
+    }
+
+    button:disabled {
+      opacity: 0.5;
+      cursor: default;
+      box-shadow: none;
+      transform: none;
+    }
+
+    button:not(:disabled):active {
+      transform: translateY(1px);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+      filter: brightness(0.96);
+    }
+
+    .stat-list {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 4px 12px;
+      font-size: 14px;
+      margin-top: 4px;
+    }
+
+    .label { font-weight: 600; }
+
+    #log {
+      background: radial-gradient(circle at top, #020617 0, #020617 40%, #0b1120 100%);
+      color: #e5e7eb;
+      font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      font-size: 13px;
+      padding: 8px;
+      border-radius: 12px;
+      height: 260px;
+      overflow-y: auto;
+      border: 1px solid #1f2937;
+    }
+
+    .log-line { margin-bottom: 2px; }
+    .log-system { color: #e5e7eb; }
+    .log-hero { color: #a5f3fc; }
+    .log-enemy { color: #fca5a5; }
+    .log-crit { color: #facc15; font-weight: 700; }
+    .log-round { color: #9ca3af; font-style: italic; }
+    .log-loot { color: #bbf7d0; }
+
+    .badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 999px;
+      background: #fffbeb;
+      font-size: 11px;
+      margin-left: 4px;
+      color: #92400e;
+      font-weight: 700;
+      border: 1px solid #fed7aa;
+    }
+
+    .hero-meta {
+      font-size: 13px;
+      margin-top: 4px;
+      color: #374151;
+    }
+
+    .avatar-wrapper {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 8px;
+    }
+
+    .avatar {
+      width: 76px;
+      height: 76px;
+      border-radius: 22px;
+      background: linear-gradient(135deg, #f97316, #facc15);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+      position: relative;
+      overflow: hidden;
+      transition: background 0.2s ease;
+    }
+
+    .avatar-face {
+      width: 42px;
+      height: 42px;
+      background: #fffbeb;
+      border-radius: 50%;
+      border: 2px solid rgba(0,0,0,0.15);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+    }
+
+    .avatar-band {
+      position: absolute;
+      bottom: 4px;
+      left: 6px;
+      right: 6px;
+      height: 18px;
+      border-radius: 999px;
+      background: rgba(15,23,42,0.85);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      color: #f9fafb;
+    }
+
+    .enemy-avatar {
+      background: linear-gradient(135deg, #ef4444, #f97316);
+    }
+
+    .enemy-card {
+      background: radial-gradient(circle at top, #020617 0, #0b1120 60%);
+      color: #e5e7eb;
+      border-color: #1f2937;
+    }
+
+    .enemy-card .card-header h2 { color: #e5e7eb; }
+    .enemy-card .card-header-tag {
+      background: rgba(15,23,42,0.7);
+      color: #e5e7eb;
+      border-color: #1f2937;
+    }
+
+    .enemy-stats { font-size: 12px; margin-top: 4px; color: #9ca3af; }
+
+    .pill {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 999px;
+      background: rgba(15,23,42,0.4);
+      font-size: 11px;
+      margin-right: 4px;
+      margin-top: 2px;
+    }
+
+    .shop-note { font-size: 12px; color: #4b5563; margin-top: 4px; }
+
+    .hp-block { margin-top: 8px; font-size: 12px; }
+
+    .hp-label {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .hp-bar-outer {
+      width: 100%;
+      height: 10px;
+      border-radius: 999px;
+      background: #111827;
+      margin-top: 2px;
+      overflow: hidden;
+    }
+
+    .hp-bar-inner {
+      height: 100%;
+      width: 100%;
+      background: linear-gradient(90deg, #22c55e, #a3e635);
+      transition: width 0.2s ease;
+    }
+
+    .hp-bar-inner.enemy {
+      background: linear-gradient(90deg, #f97316, #ef4444);
+    }
+
+    .hp-combat-row {
+      display: flex;
+      gap: 12px;
+      margin-top: 4px;
+    }
+
+    .hp-combat-row .hp-block { flex: 1; }
+
+    .arena-rank { font-weight: 600; }
+
+    .arena-rank-badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 999px;
+      font-size: 11px;
+      margin-left: 4px;
+      background: #e5e7eb;
+      color: #111827;
+    }
+
+    .skip-line {
+      margin-top: 6px;
+      font-size: 12px;
+      color: #4b5563;
+    }
+
+    .skip-line input { margin-right: 4px; }
+
+    #inventoryList { max-height: 180px; overflow-y: auto; }
+
+    @media (max-width: 768px) {
+      .topbar { padding-inline: 10px; }
+      .page { padding-inline: 10px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app-shell">
+    <header class="topbar">
+      <div class="topbar-left">
+        <div class="logo-pill">
+          <div class="logo-pill-inner">C</div>
+        </div>
+        <div class="topbar-title">
+          <h1>Cartoon Clash Arena</h1>
+          <div>Histoire, PvP, loot, inventaire… et godmode 😈</div>
+        </div>
+      </div>
+      <div class="topbar-right">
+        <div class="chip">
+          <span>💻 DEV :</span>
+          <span>Ctrl+Shift+C → +100 💰</span>
+          <span>Ctrl+Shift+M → MAX</span>
+          <span>Ctrl+Shift+G → GOD MODE</span>
+        </div>
+      </div>
+    </header>
+
+    <main class="page">
+      <div class="main-layout">
+        <!-- COLONNE GAUCHE -->
+        <div class="col-left">
+          <!-- Héros -->
+          <div class="card">
+            <div class="card-header">
+              <h2><span class="icon">🧍‍♂️</span> Ton héros</h2>
+              <div class="card-header-tag">Build & stats</div>
+            </div>
+            <div class="card-body">
+              <div class="avatar-wrapper">
+                <div class="avatar">
+                  <div class="avatar-face">😎</div>
+                  <div class="avatar-band" id="avatarBand">Bruiser</div>
+                </div>
+                <div>
+                  <div id="heroName"></div>
+                  <div class="hero-meta" id="heroMeta"></div>
+                </div>
+              </div>
+              <div class="stat-list" id="heroStats"></div>
+              <div class="hp-block">
+                <div class="hp-label">
+                  <span>PV max</span>
+                  <span id="heroHPText">—</span>
+                </div>
+                <div class="hp-bar-outer">
+                  <div id="heroHPBarInner" class="hp-bar-inner"></div>
+                </div>
+              </div>
+              <p style="margin-top:8px;font-size:13px;">
+                Points de stats à répartir : <span id="statPoints">0</span>
+              </p>
+              <div id="statButtons"></div>
+            </div>
+          </div>
+
+          <!-- Histoire -->
+          <div class="card">
+            <div class="card-header">
+              <h2><span class="icon">📖</span> Mode histoire (PvE)</h2>
+              <div class="card-header-tag">Farm XP / pièces</div>
+            </div>
+            <div class="card-body">
+              <button onclick="startMission('easy')">Mission facile</button>
+              <button class="secondary" onclick="startMission('normal')">Mission normale</button>
+              <button class="danger" onclick="startMission('hard')">Mission difficile</button>
+              <div style="margin-top:8px;font-size:13px;">
+                Plus la difficulté est haute, plus les récompenses sont bonnes… et plus ça cogne.
+              </div>
+              <div class="skip-line">
+                <label>
+                  <input type="checkbox" id="instantToggle" onchange="toggleInstantResolve(this)">
+                  Résoudre les combats instantanément
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <!-- Arène -->
+          <div class="card">
+            <div class="card-header">
+              <h2><span class="icon">🏟️</span> Arène PvP</h2>
+              <div class="card-header-tag">Ladder & rang</div>
+            </div>
+            <div class="card-body">
+              <div id="arenaInfo" style="margin-bottom:6px;"></div>
+              <button onclick="startArenaBattle()">Match d'arène</button>
+              <div style="margin-top:8px;font-size:13px;">
+                Affronte des “joueurs” simulés, gagne des points d'arène et monte de rang.
+              </div>
+            </div>
+          </div>
+
+          <!-- Boutique -->
+          <div class="card">
+            <div class="card-header">
+              <h2><span class="icon">🛒</span> Boutique</h2>
+              <div class="card-header-tag">Stats & équipement</div>
+            </div>
+            <div class="card-body">
+              <button onclick="buyStatPoint()">+1 point de stats (30 pièces)</button>
+              <button class="secondary" onclick="buyRandomItem()">Caisse mystère (20 pièces)</button>
+              <button onclick="buyFixedItem('proGloves')">Gants pro (+3 FOR, +1 PRE) – 40 pièces</button>
+              <button onclick="buyFixedItem('paddedJacket')">Blouson renforcé (+4 VIT, +1 ESQ) – 40 pièces</button>
+              <button onclick="buyFixedItem('champRing')">Bague épique (+2 PRE, +2 VITZ) – 40 pièces</button>
+              <button onclick="refreshShop(true)">🔁 Rafraîchir la boutique (5 pièces)</button>
+              <div id="shopInfo" class="shop-note">
+                Les objets peuvent être équipés directement ou rangés dans ton inventaire.
+              </div>
+              <div id="shopItemsList" class="shop-note" style="margin-top:8px;"></div>
+            </div>
+          </div>
+
+          <!-- Équipement -->
+          <div class="card">
+            <div class="card-header">
+              <h2><span class="icon">🧰</span> Équipement équipé</h2>
+              <div class="card-header-tag">Ce que tu portes</div>
+            </div>
+            <div class="card-body">
+              <div id="equipment"></div>
+            </div>
+          </div>
+
+          <!-- Inventaire -->
+          <div class="card">
+            <div class="card-header">
+              <h2><span class="icon">🎒</span> Inventaire</h2>
+              <div class="card-header-tag">Objets stockés</div>
+            </div>
+            <div class="card-body">
+              <div id="inventoryList" style="font-size:13px;"></div>
+              <div style="font-size:11px;color:#6b7280;margin-top:4px;">
+                Ici sont stockés les objets que tu possèdes mais qui ne sont pas équipés.
+              </div>
+            </div>
+          </div>
+
+          <!-- Cosmétiques -->
+          <div class="card">
+            <div class="card-header">
+              <h2><span class="icon">🎨</span> Cosmétiques</h2>
+              <div class="card-header-tag">Skins & style</div>
+            </div>
+            <div class="card-body">
+              <div id="cosmeticsList" style="font-size:13px;"></div>
+              <div style="font-size:11px;color:#6b7280;margin-top:4px;">
+                Certains skins se débloquent via les défis (arène, niveau, etc.).
+              </div>
+            </div>
+          </div>
+
+          <!-- Défis -->
+          <div class="card">
+            <div class="card-header">
+              <h2><span class="icon">✅</span> Carnet de défis</h2>
+              <div class="card-header-tag">Objectifs & récompenses</div>
+            </div>
+            <div class="card-body">
+              <div id="achievementsList" style="font-size:13px;"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- COLONNE DROITE -->
+        <div class="col-right">
+          <!-- Ennemi -->
+          <div class="card enemy-card">
+            <div class="card-header">
+              <h2><span class="icon">🤜</span> Adversaire actuel</h2>
+              <div class="card-header-tag">Cible</div>
+            </div>
+            <div class="card-body">
+              <div class="avatar-wrapper">
+                <div class="avatar enemy-avatar">
+                  <div class="avatar-face">😠</div>
+                  <div class="avatar-band" id="enemyBand">En attente</div>
+                </div>
+                <div>
+                  <div id="enemyInfo">Aucun ennemi pour l'instant. Lance une mission ou un match d'arène.</div>
+                  <div class="enemy-stats" id="enemyStats"></div>
+                  <div class="hp-block" style="margin-top:6px;">
+                    <div class="hp-label">
+                      <span>PV max ennemi</span>
+                      <span id="enemyHPText">—</span>
+                    </div>
+                    <div class="hp-bar-outer">
+                      <div id="enemyHPBarInner" class="hp-bar-inner enemy"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- PV combat -->
+          <div class="card">
+            <div class="card-header">
+              <h2><span class="icon">❤️</span> PV du combat</h2>
+              <div class="card-header-tag">Round en cours</div>
+            </div>
+            <div class="card-body">
+              <div class="hp-combat-row">
+                <div class="hp-block">
+                  <div class="hp-label">
+                    <span>Toi</span>
+                    <span id="duelHeroHPText">—</span>
+                  </div>
+                  <div class="hp-bar-outer">
+                    <div id="duelHeroHPBar" class="hp-bar-inner"></div>
+                  </div>
+                </div>
+                <div class="hp-block">
+                  <div class="hp-label">
+                    <span>Ennemi</span>
+                    <span id="duelEnemyHPText">—</span>
+                  </div>
+                  <div class="hp-bar-outer">
+                    <div id="duelEnemyHPBar" class="hp-bar-inner enemy"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Journal -->
+          <div class="card">
+            <div class="card-header">
+              <h2><span class="icon">📜</span> Journal de combat</h2>
+              <div class="card-header-tag">Round par round</div>
+            </div>
+            <div class="card-body">
+              <div id="log"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    const DEV_MODE = true;
+    const LEVEL_CAP = 30;
+    let GOD_MODE = false; // toggle godmode
+
+    const slotEmojis = {
+      weapon: "🥊",
+      helmet: "🧢",
+      armor: "🧥",
+      boots: "👟",
+      accessory: "💍"
+    };
+
+    const RARITIES = [
+      { id: "common",    name: "Commun",       color: "#9ca3af", weight: 40, statMult: 1.0 },
+      { id: "uncommon",  name: "Peu commun",   color: "#22c55e", weight: 30, statMult: 1.3 },
+      { id: "rare",      name: "Rare",         color: "#3b82f6", weight: 18, statMult: 1.6 },
+      { id: "epic",      name: "Épique",       color: "#a855f7", weight: 9,  statMult: 2.0 },
+      { id: "legendary", name: "Légendaire",   color: "#ef4444", weight: 3,  statMult: 2.3 }
+    ];
+
+    const SKINS = {
+      default: {
+        id: "default",
+        name: "Classique",
+        face: "😎",
+        bandText: "Bruiser",
+        gradient: "linear-gradient(135deg,#f97316,#facc15)"
+      },
+      street: {
+        id: "street",
+        name: "Street Hero",
+        face: "😏",
+        bandText: "Street",
+        gradient: "linear-gradient(135deg,#4ade80,#22c55e)"
+      },
+      gold: {
+        id: "gold",
+        name: "Champion doré",
+        face: "😌",
+        bandText: "Gold",
+        gradient: "linear-gradient(135deg,#facc15,#f97316)"
+      }
+    };
+
+    const ACHIEVEMENTS = [
+      { id: "story5",  name: "Début de carrière",     desc: "Gagner 5 missions histoire.",     type: "storyWins",  target: 5,  rewardCoins: 50 },
+      { id: "story20", name: "Bourreau de quartier",  desc: "Gagner 20 missions histoire.",    type: "storyWins",  target: 20, rewardCoins: 120 },
+      { id: "arena3",  name: "Rookie de l'arène",     desc: "Gagner 3 matchs d'arène.",        type: "arenaWins",  target: 3,  rewardCoins: 60,  unlockSkin: "street" },
+      { id: "arena10", name: "Terreur du ladder",     desc: "Gagner 10 matchs d'arène.",       type: "arenaWins",  target: 10, rewardCoins: 150 },
+      { id: "lvl5",    name: "Montée en puissance",   desc: "Atteindre le niveau 5.",          type: "level",      target: 5,  rewardCoins: 40 },
+      { id: "lvl10",   name: "Champion du bloc",      desc: "Atteindre le niveau 10.",         type: "level",      target: 10, rewardCoins: 80,  unlockSkin: "gold" },
+      { id: "crit50",  name: "Grosse patate",         desc: "Mettre un crit d'au moins 50 dégâts.", type: "bestCrit", target: 50, rewardCoins: 50 },
+      { id: "rating200", name: "Respect du quartier", desc: "Atteindre 200 points d'arène.",   type: "arenaRating", target: 200, rewardCoins: 100 }
+    ];
+
+    const baseHero = {
+      name: "Champion",
+      level: 1,
+      xp: 0,
+      xpToNext: 10,
+      coins: 0,
+      stats: { FOR: 7, VIT: 8, PRE: 5, ESQ: 3, VITZ: 4 },
+      bonusStats: { FOR: 0, VIT: 0, PRE: 0, ESQ: 0, VITZ: 0 },
+      statPoints: 0,
+      equipment: {
+        weapon:   { name: "Gants de boxe en mousse", FOR: 2, PRE: 1, rarityId: "common" },
+        helmet:   { name: "Casquette retournée", ESQ: 1,              rarityId: "common" },
+        armor:    { name: "Hoodie rembourré",     VIT: 2,              rarityId: "common" },
+        boots:    { name: "Baskets trouées",      VITZ: 1,             rarityId: "common" },
+        accessory:{ name: "Chaîne en plastique doré", PRE: 1,          rarityId: "common" }
+      },
+      arena: { rating: 0, wins: 0, losses: 0 },
+      progress: null,
+      achievementsDone: null,
+      cosmetics: null,
+      shop: null,
+      inventory: []
+    };
+
+    function loadHero() {
+      const raw = localStorage.getItem("cca_hero");
+      if (!raw) return null;
+      try { return JSON.parse(raw); } catch { return null; }
+    }
+
+    function saveHero() {
+      localStorage.setItem("cca_hero", JSON.stringify(hero));
+    }
+
+    let hero = loadHero() || structuredClone(baseHero);
+    let currentEnemy = null;
+    let combatContext = null;
+    let pendingLines = [];
+
+    const heroMissTexts = [
+      "Tu balances une patate dans le vent, il se baisse au dernier moment. 😬",
+      "Tu visais la tête… tu touches l'air. Feinte involontaire. 😅",
+      "Tu glisses un peu, ton coup part à côté. Ça arrive aux meilleurs. 🙃"
+    ];
+    const heroHitTexts = [
+      "Tu lui colles un bon coup pour {dmg} dégâts. (PV ennemi : {hp})",
+      "Tu le touches proprement : {dmg} dégâts. (Il lui reste {hp} PV)",
+      "Belle patate ! {dmg} dégâts. (PV ennemis restants : {hp})"
+    ];
+    const heroCritTexts = [
+      "COUP CRITIQUE dans le menton ! {dmg} dégâts 💥 (PV ennemi : {hp})",
+      "Tu l'envoies presque au plafond : CRIT {dmg} dégâts ! 💣 (PV ennemi : {hp})",
+      "Grosse droite critique : {dmg} dégâts ! (Il vacille, PV : {hp})"
+    ];
+    const enemyMissTexts = [
+      "{name} tente un gros swing mais tu le regardes passer comme un spectateur. 😎",
+      "{name} s'emmêle les pieds, tu esquives sans forcer. 🕺",
+      "{name} charge… et tu n'es déjà plus là. Esquive propre. 👟"
+    ];
+    const enemyHitTexts = [
+      "{name} te place un coup pour {dmg} dégâts. (Tes PV : {hp})",
+      "{name} te touche, ça pique un peu : {dmg} dégâts. (PV restants : {hp})",
+      "{name} trouve l'ouverture et t'en colle une : {dmg} dégâts. (Tes PV : {hp})"
+    ];
+    const enemyCritTexts = [
+      "{name} te met une grosse mandale critique : {dmg} dégâts ! 💥 (Tes PV : {hp})",
+      "Aïe, crit dans les côtes par {name} : {dmg} dégâts… (Tes PV : {hp})",
+      "{name} te surprend avec un CRIT de {dmg} dégâts ! (Tes PV : {hp})"
+    ];
+    const arenaNames = [
+      "DarkNico", "CritMaster", "Tankito", "NoLifeur", "StreetLegend",
+      "UppercutKing", "La Foudre", "LowLifePro", "MamadouFlex", "TapTapSpam"
+    ];
+
+    function rand(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+
+    // --- DEV CHEATS ---
+    function devAddCoins(amount = 100) {
+      if (!DEV_MODE) return;
+      hero.coins += amount;
+      saveHero();
+      renderAll();
+      log(`[DEV] +${amount} pièces ajoutées.`, "system");
+      flushLogQueue();
+    }
+
+    function devMaxOut() {
+      if (!DEV_MODE) return;
+
+      hero.level = LEVEL_CAP;
+      hero.xp = hero.xpToNext;
+
+      hero.stats = {
+        FOR: 50,
+        VIT: 50,
+        PRE: 40,
+        ESQ: 30,
+        VITZ: 35
+      };
+
+      hero.coins = 99999;
+
+      const legendary = RARITIES.find(r => r.id === "legendary");
+      const slots = ["weapon", "helmet", "armor", "boots", "accessory"];
+
+      slots.forEach(slot => {
+        let data;
+        do {
+          data = generateRandomItem(legendary);
+        } while (data.slot !== slot);
+        hero.equipment[slot] = data.item;
+      });
+
+      hero.arena = hero.arena || { rating: 0, wins: 0, losses: 0 };
+      hero.arena.rating = 500;
+      hero.arena.wins  = Math.max(hero.arena.wins || 0, 50);
+
+      hero.progress = hero.progress || {};
+      hero.progress.storyWins        = Math.max(hero.progress.storyWins || 0, 50);
+      hero.progress.arenaWins        = Math.max(hero.progress.arenaWins || 0, 30);
+      hero.progress.bestCrit         = Math.max(hero.progress.bestCrit || 0, 150);
+      hero.progress.maxLevel         = LEVEL_CAP;
+      hero.progress.arenaRatingBest  = Math.max(hero.progress.arenaRatingBest || 0, hero.arena.rating || 0);
+
+      if (hero.cosmetics) {
+        hero.cosmetics.unlocked = Object.keys(SKINS);
+      }
+
+      saveHero();
+      renderAll();
+      log("[DEV] Héros MAXÉ : niveau max, grosses stats, full légendaire, arène boostée et skins débloqués.", "system");
+      flushLogQueue();
+    }
+
+    function devToggleGodMode() {
+      if (!DEV_MODE) return;
+      GOD_MODE = !GOD_MODE;
+      if (GOD_MODE) {
+        log("[DEV] GOD MODE activé : tu ne prends plus de dégâts et tu ne peux plus perdre. 😈", "system");
+      } else {
+        log("[DEV] GOD MODE désactivé : retour au mode normal.", "system");
+      }
+      flushLogQueue();
+    }
+
+    document.addEventListener("keydown", (e) => {
+      if (!DEV_MODE) return;
+      const key = e.key.toLowerCase();
+
+      if (e.ctrlKey && e.shiftKey && key === "c") {
+        devAddCoins(100);
+      }
+      if (e.ctrlKey && e.shiftKey && key === "m") {
+        devMaxOut();
+      }
+      if (e.ctrlKey && e.shiftKey && key === "g") {
+        devToggleGodMode();
+      }
+    });
+
+    // --- AUTRES VARIABLES & FONCTIONS ---
+
+    let instantResolve = false;
+    function toggleInstantResolve(cb) {
+      instantResolve = cb.checked;
+      log(
+        instantResolve
+          ? "Les combats seront résolus instantanément."
+          : "Les combats reviennent en mode animation tour par tour.",
+        "system"
+      );
+      flushLogQueue();
+    }
+
+    function ensureStructures() {
+      if (!hero.arena) hero.arena = { rating: 0, wins: 0, losses: 0 };
+      if (!hero.progress) {
+        hero.progress = {
+          storyWins: 0,
+          arenaWins: 0,
+          bestCrit: 0,
+          maxLevel: hero.level || 1,
+          arenaRatingBest: hero.arena.rating || 0
+        };
+      }
+      if (hero.progress.maxLevel == null) hero.progress.maxLevel = hero.level || 1;
+      if (hero.progress.arenaRatingBest == null) hero.progress.arenaRatingBest = hero.arena.rating || 0;
+      if (!hero.achievementsDone) hero.achievementsDone = {};
+      if (!hero.cosmetics) hero.cosmetics = { currentSkin: "default", unlocked: ["default"] };
+      if (!hero.cosmetics.unlocked || hero.cosmetics.unlocked.length === 0)
+        hero.cosmetics.unlocked = ["default"];
+      if (!hero.cosmetics.currentSkin) hero.cosmetics.currentSkin = "default";
+      if (!hero.shop) hero.shop = { items: [] };
+      if (!hero.shop.items) hero.shop.items = [];
+      if (!hero.inventory) hero.inventory = [];
+
+      if (hero.equipment) {
+        for (const key of Object.keys(hero.equipment)) {
+          const it = hero.equipment[key];
+          if (it && !it.rarityId) it.rarityId = "common";
+        }
+      }
+    }
+
+    function getRarityById(id) {
+      return RARITIES.find(r => r.id === id) || RARITIES[0];
+    }
+
+    function getTotalStat(stat) {
+      let base = hero.stats[stat] || 0;
+      let bonus = hero.bonusStats[stat] || 0;
+      for (const slot of Object.values(hero.equipment)) {
+        if (!slot) continue;
+        if (slot[stat]) bonus += slot[stat];
+      }
+      return base + bonus;
+    }
+
+    function maxHP() { return getTotalStat("VIT") * 10; }
+
+    function resetDuelBars() {
+      document.getElementById("duelHeroHPText").textContent = "—";
+      document.getElementById("duelEnemyHPText").textContent = "—";
+      document.getElementById("duelHeroHPBar").style.width = "0%";
+      document.getElementById("duelEnemyHPBar").style.width = "0%";
+    }
+
+    function updateDuelHP(heroHPValue, enemyHPValue) {
+      if (!combatContext) return;
+      const hBar = document.getElementById("duelHeroHPBar");
+      const eBar = document.getElementById("duelEnemyHPBar");
+      const hText = document.getElementById("duelHeroHPText");
+      const eText = document.getElementById("duelEnemyHPText");
+
+      const hMax = combatContext.heroMaxHP || maxHP();
+      const eMax = combatContext.enemyMaxHP || (currentEnemy ? currentEnemy.VIT * 10 : 1);
+      const h = Math.max(0, Math.min(heroHPValue ?? hMax, hMax));
+      const e = Math.max(0, Math.min(enemyHPValue ?? eMax, eMax));
+
+      hText.textContent = `${h} / ${hMax}`;
+      eText.textContent = `${e} / ${eMax}`;
+      hBar.style.width = ((h / hMax) * 100).toFixed(1) + "%";
+      eBar.style.width = ((e / eMax) * 100).toFixed(1) + "%";
+    }
+
+    function clearLog() {
+      document.getElementById("log").innerHTML = "";
+      pendingLines = [];
+    }
+
+    function log(text, type = "system", heroHPValue = null, enemyHPValue = null) {
+      pendingLines.push({ text, type, heroHP: heroHPValue, enemyHP: enemyHPValue });
+    }
+
+    function renderLogEntry(entry) {
+      const el = document.getElementById("log");
+      if (entry.text !== "") {
+        const line = document.createElement("div");
+        line.className = "log-line log-" + (entry.type || "system");
+        line.textContent = entry.text;
+        el.appendChild(line);
+        el.scrollTop = el.scrollHeight;
+      }
+      if (entry.heroHP != null || entry.enemyHP != null) {
+        updateDuelHP(entry.heroHP, entry.enemyHP);
+      }
+    }
+
+    function playLogQueue(queue, done) {
+      let i = 0;
+      function step() {
+        if (i >= queue.length) { if (done) done(); return; }
+        const entry = queue[i++];
+        renderLogEntry(entry);
+        const delay = entry.type === "round" ? 450 : entry.type === "" ? 250 : 550;
+        setTimeout(step, delay);
+      }
+      step();
+    }
+
+    function flushLogQueue(done) {
+      const queue = pendingLines.slice();
+      pendingLines = [];
+      if (queue.length === 0) { if (done) done(); return; }
+      if (instantResolve) {
+        for (const entry of queue) renderLogEntry(entry);
+        if (done) done();
+      } else {
+        playLogQueue(queue, done);
+      }
+    }
+
+    function difficultyLabel(diff) {
+      return diff === "easy" ? "facile" : diff === "normal" ? "normale" : "difficile";
+    }
+
+    function getArenaRankName(rating) {
+      if (rating >= 1000) return "Légende";
+      if (rating >= 600) return "Or";
+      if (rating >= 300) return "Argent";
+      if (rating >= 100) return "Bronze";
+      return "Non classé";
+    }
+
+    function getArenaRankEmoji(rating) {
+      if (rating >= 1000) return "🏆";
+      if (rating >= 600) return "🥇";
+      if (rating >= 300) return "🥈";
+      if (rating >= 100) return "🥉";
+      return "⚪";
+    }
+
+    function generateRandomItem(rarityOverride) {
+      const slotPool = ["weapon", "helmet", "armor", "boots", "accessory"];
+      const slot = slotPool[Math.floor(Math.random() * slotPool.length)];
+      const baseNames = {
+        weapon: ["Poing américain en plastique", "Bat gonflable", "Gants renforcés"],
+        helmet: ["Casque de scooter rayé", "Bandana serré", "Bonnet rembourré"],
+        armor: ["Blouson matelassé", "Gilet pare-choc", "Manteau épais"],
+        boots: ["Sneakers de course", "Rangers urbaines", "Chaussures à ressort"],
+        accessory: ["Bague de champion", "Bracelet de sport", "Pendentif porte-bonheur"]
+      };
+      const name = baseNames[slot][Math.floor(Math.random() * baseNames[slot].length)];
+      const rarity = rarityOverride || chooseRarity();
+      const newItem = { name, rarityId: rarity.id };
+      const statsKeys = ["FOR", "VIT", "PRE", "ESQ", "VITZ"];
+      const nbStats = 1 + Math.floor(Math.random() * 3);
+      for (let i = 0; i < nbStats; i++) {
+        const s = statsKeys[Math.floor(Math.random() * statsKeys.length)];
+        const baseVal = 1 + Math.floor(Math.random() * 3);
+        const val = Math.max(1, Math.round(baseVal * rarity.statMult));
+        newItem[s] = (newItem[s] || 0) + val;
+      }
+      return { slot, item: newItem, rarityId: rarity.id };
+    }
+
+    function chooseRarity() {
+      const total = RARITIES.reduce((s, r) => s + r.weight, 0);
+      let roll = Math.random() * total;
+      for (const r of RARITIES) {
+        if (roll < r.weight) return r;
+        roll -= r.weight;
+      }
+      return RARITIES[0];
+    }
+
+    function itemScore(item) {
+      let score = 0;
+      for (const [k, v] of Object.entries(item)) {
+        if (["FOR", "VIT", "PRE", "ESQ", "VITZ"].includes(k)) score += v;
+      }
+      return score;
+    }
+
+    function addItemToInventory(slot, item) {
+      if (!hero.inventory) hero.inventory = [];
+      hero.inventory.push({
+        id: Date.now().toString() + Math.random().toString(16).slice(2),
+        slot,
+        item: structuredClone(item)
+      });
+    }
+
+    function equipFromInventory(entryId) {
+      const entry = hero.inventory.find(e => e.id === entryId);
+      if (!entry) return;
+      const slot = entry.slot;
+      const newItem = entry.item;
+      const current = hero.equipment[slot];
+      hero.equipment[slot] = structuredClone(newItem);
+      hero.inventory = hero.inventory.filter(e => e.id !== entryId);
+      if (current) {
+        addItemToInventory(slot, current);
+      }
+      saveHero();
+      renderAll();
+      log(`Tu équipes ${newItem.name} depuis ton inventaire.`, "loot");
+      flushLogQueue();
+    }
+
+    function buyStatPoint() {
+      const cost = 30;
+      const shopInfo = document.getElementById("shopInfo");
+      if (hero.coins < cost) {
+        log("Tu n'as pas assez de pièces pour acheter un point de stats. (30 nécessaires)", "system");
+        flushLogQueue();
+        shopInfo.textContent = "Pas assez de pièces pour un point de stats.";
+        return;
+      }
+      hero.coins -= cost;
+      hero.statPoints += 1;
+      log(`Tu achètes un point de stats pour ${cost} pièces. Tu as maintenant ${hero.statPoints} point(s) à répartir.`, "loot");
+      shopInfo.textContent = "Point de stats acheté ! Pense à le dépenser dans le panneau Héros.";
+      saveHero();
+      renderAll();
+      flushLogQueue();
+    }
+
+    function handleNewEquipment(slot, newItem, sourceLabel) {
+      const current = hero.equipment[slot];
+      if (!current) {
+        hero.equipment[slot] = structuredClone(newItem);
+        log(`${sourceLabel} : tu n'avais rien dans ce slot, tu équipes le nouvel objet.`, "loot");
+        return;
+      }
+      const curScore = itemScore(current);
+      const newScore = itemScore(newItem);
+      log(`Objet actuel : ${current.name} (score ${curScore})`, "system");
+      log(`Nouvel objet : ${newItem.name} (score ${newScore})`, "system");
+
+      if (newScore > curScore) {
+        hero.equipment[slot] = structuredClone(newItem);
+        addItemToInventory(slot, current);
+        log(`${sourceLabel} : tu équipes le nouvel objet, l'ancien va dans l'inventaire.`, "loot");
+      } else {
+        addItemToInventory(slot, newItem);
+        log(`${sourceLabel} : tu gardes ton objet actuel, le nouvel objet va dans l'inventaire.`, "system");
+      }
+    }
+
+    function buyRandomItem() {
+      const cost = 20;
+      const shopInfo = document.getElementById("shopInfo");
+      if (hero.coins < cost) {
+        log("Tu n'as pas assez de pièces pour acheter une caisse mystère (20 nécessaires).", "system");
+        flushLogQueue();
+        shopInfo.textContent = "Pas assez de pièces pour la caisse mystère.";
+        return;
+      }
+      hero.coins -= cost;
+      const result = generateRandomItem();
+      const slot = result.slot;
+      const newItem = result.item;
+      const rarity = getRarityById(result.rarityId);
+      const emoji = slotEmojis[slot] || "📦";
+
+      log("", "system");
+      log(`🛒 Caisse mystère : ${emoji} ${newItem.name} [${rarity.name}]`, "loot");
+      handleNewEquipment(slot, newItem, "Caisse mystère");
+      shopInfo.textContent = "Achat effectué ! L'objet est équipé ou rangé dans l'inventaire.";
+      saveHero();
+      renderAll();
+      flushLogQueue();
+    }
+
+    const fixedShop = {
+      proGloves: {
+        cost: 40,
+        slot: "weapon",
+        item: { name: "Gants pro", FOR: 3, PRE: 1, rarityId: "rare" }
+      },
+      paddedJacket: {
+        cost: 40,
+        slot: "armor",
+        item: { name: "Blouson renforcé", VIT: 4, ESQ: 1, rarityId: "uncommon" }
+      },
+      champRing: {
+        cost: 40,
+        slot: "accessory",
+        item: { name: "Bague épique", PRE: 2, VITZ: 2, rarityId: "epic" }
+      }
+    };
+
+    function buyFixedItem(key) {
+      const offer = fixedShop[key];
+      const shopInfo = document.getElementById("shopInfo");
+      if (!offer) return;
+      if (hero.coins < offer.cost) {
+        log(`Tu n'as pas assez de pièces pour acheter ${offer.item.name} (${offer.cost} nécessaires).`, "system");
+        flushLogQueue();
+        shopInfo.textContent = "Pas assez de pièces pour cet objet.";
+        return;
+      }
+      hero.coins -= offer.cost;
+      const slot = offer.slot;
+      const newItem = structuredClone(offer.item);
+      const rarity = getRarityById(newItem.rarityId || "common");
+      const emoji = slotEmojis[slot] || "📦";
+
+      log("", "system");
+      log(`🛒 Tu achètes : ${emoji} ${newItem.name} [${rarity.name}]`, "loot");
+      handleNewEquipment(slot, newItem, "Objet fixe");
+      shopInfo.textContent = "Achat effectué (objet fixe).";
+      saveHero();
+      renderAll();
+      flushLogQueue();
+    }
+
+    function generateShopOffer() {
+      const res = generateRandomItem();
+      const rarity = getRarityById(res.rarityId);
+      const baseCostByRarity = {
+        common: 20,
+        uncommon: 28,
+        rare: 40,
+        epic: 60,
+        legendary: 85
+      };
+      const cost = baseCostByRarity[rarity.id] || 25;
+      return {
+        id: Date.now().toString() + Math.random().toString(16).slice(2),
+        slot: res.slot,
+        item: res.item,
+        rarityId: res.rarityId,
+        cost
+      };
+    }
+
+    function refreshShop(pay) {
+      const shopInfo = document.getElementById("shopInfo");
+      const refreshCost = 5;
+      if (pay) {
+        if (hero.coins < refreshCost) {
+          log("Tu n'as pas assez de pièces pour rafraîchir la boutique (5 nécessaires).", "system");
+          flushLogQueue();
+          shopInfo.textContent = "Pas assez de pièces pour rafraîchir.";
+          return;
+        }
+        hero.coins -= refreshCost;
+        log("Tu rafraîchis la boutique, de nouveaux équipements apparaissent.", "system");
+      }
+      hero.shop.items = [];
+      for (let i = 0; i < 3; i++) hero.shop.items.push(generateShopOffer());
+      saveHero();
+      renderAll();
+      flushLogQueue();
+    }
+
+    function buyShopOffer(id) {
+      const idx = hero.shop.items.findIndex(o => o.id === id);
+      if (idx < 0) return;
+      const offer = hero.shop.items[idx];
+      if (hero.coins < offer.cost) {
+        log("Tu n'as pas assez de pièces pour cet objet de la boutique.", "system");
+        flushLogQueue();
+        return;
+      }
+      hero.coins -= offer.cost;
+      const slot = offer.slot;
+      const newItem = offer.item;
+      const rarity = getRarityById(offer.rarityId);
+      const emoji = slotEmojis[slot] || "📦";
+
+      log("", "system");
+      log(`🛒 Tu achètes : ${emoji} ${newItem.name} [${rarity.name}]`, "loot");
+      handleNewEquipment(slot, newItem, "Boutique");
+      hero.shop.items.splice(idx, 1);
+      saveHero();
+      renderAll();
+      flushLogQueue();
+    }
+
+    function applyCurrentSkin() {
+      const skin = SKINS[hero.cosmetics.currentSkin] || SKINS.default;
+      const avatar = document.querySelector(".avatar");
+      const face = document.querySelector(".avatar-face");
+      const band = document.getElementById("avatarBand");
+      if (avatar && skin.gradient) avatar.style.background = skin.gradient;
+      if (face && skin.face) face.textContent = skin.face;
+      if (band && skin.bandText) band.textContent = skin.bandText;
+    }
+
+    function renderCosmetics() {
+      const list = document.getElementById("cosmeticsList");
+      if (!list) return;
+      list.innerHTML = "";
+      Object.values(SKINS).forEach(skin => {
+        const unlocked = hero.cosmetics.unlocked.includes(skin.id);
+        const isCurrent = hero.cosmetics.currentSkin === skin.id;
+        const row = document.createElement("div");
+        row.style.marginBottom = "4px";
+        const icon = unlocked ? "🎨" : "🔒";
+        row.innerHTML =
+          `${icon} <strong>${skin.name}</strong>` +
+          (isCurrent ? " – (Équipé)" :
+           unlocked ? " – (Disponible)" : " – (À débloquer)");
+        if (unlocked && !isCurrent) {
+          const btn = document.createElement("button");
+          btn.textContent = "Équiper";
+          btn.style.marginLeft = "6px";
+          btn.onclick = () => {
+            hero.cosmetics.currentSkin = skin.id;
+            saveHero();
+            applyCurrentSkin();
+            renderCosmetics();
+          };
+          row.appendChild(btn);
+        }
+        list.appendChild(row);
+      });
+    }
+
+    function checkAchievements() {
+      ACHIEVEMENTS.forEach(def => {
+        if (hero.achievementsDone[def.id]) return;
+        let value = 0;
+        switch (def.type) {
+          case "storyWins":  value = hero.progress.storyWins || 0; break;
+          case "arenaWins":  value = hero.progress.arenaWins || 0; break;
+          case "level":      value = hero.progress.maxLevel || hero.level; break;
+          case "bestCrit":   value = hero.progress.bestCrit || 0; break;
+          case "arenaRating":value = hero.progress.arenaRatingBest || 0; break;
+        }
+        if (value >= def.target) {
+          hero.achievementsDone[def.id] = true;
+          if (def.rewardCoins) {
+            hero.coins += def.rewardCoins;
+            log(`Défi réussi : ${def.name} ! Récompense : +${def.rewardCoins} pièces.`, "loot");
+          }
+          if (def.rewardStatPoints) {
+            hero.statPoints = (hero.statPoints || 0) + def.rewardStatPoints;
+            log(`Tu gagnes ${def.rewardStatPoints} points de stats supplémentaires.`, "loot");
+          }
+          if (def.unlockSkin) {
+            if (!hero.cosmetics.unlocked.includes(def.unlockSkin)) {
+              hero.cosmetics.unlocked.push(def.unlockSkin);
+              const skin = SKINS[def.unlockSkin];
+              if (skin) log(`🎨 Nouveau skin débloqué : ${skin.name} !`, "loot");
+            }
+          }
+        }
+      });
+    }
+
+    function renderAchievements() {
+      const list = document.getElementById("achievementsList");
+      if (!list) return;
+      list.innerHTML = "";
+      ACHIEVEMENTS.forEach(def => {
+        const done = !!hero.achievementsDone[def.id];
+        let value = 0;
+        switch (def.type) {
+          case "storyWins":  value = hero.progress.storyWins || 0; break;
+          case "arenaWins":  value = hero.progress.arenaWins || 0; break;
+          case "level":      value = hero.progress.maxLevel || hero.level; break;
+          case "bestCrit":   value = hero.progress.bestCrit || 0; break;
+          case "arenaRating":value = hero.progress.arenaRatingBest || 0; break;
+        }
+        const icon = done ? "✅" : "⬜";
+        const row = document.createElement("div");
+        row.style.marginBottom = "4px";
+        row.textContent =
+          `${icon} ${def.name} – ${def.desc} (${Math.min(value, def.target)}/${def.target})`;
+        list.appendChild(row);
+      });
+    }
+
+    function renderHero() {
+      const levelLabel =
+        hero.level >= LEVEL_CAP
+          ? `Niv. ${hero.level} (MAX)`
+          : `Niv. ${hero.level} / ${LEVEL_CAP}`;
+      document.getElementById("heroName").innerHTML =
+        `<strong>${hero.name}</strong> <span class="badge">${levelLabel}</span>`;
+      document.getElementById("heroMeta").textContent =
+        `XP : ${hero.xp} / ${hero.xpToNext} • Pièces : ${hero.coins}`;
+
+      const statsEl = document.getElementById("heroStats");
+      statsEl.innerHTML = "";
+      const stats = ["FOR", "VIT", "PRE", "ESQ", "VITZ"];
+      stats.forEach(stat => {
+        const rowLabel = document.createElement("div");
+        const rowVal = document.createElement("div");
+        rowLabel.textContent =
+          stat === "FOR" ? "Force" :
+          stat === "VIT" ? "Vitalité" :
+          stat === "PRE" ? "Précision" :
+          stat === "ESQ" ? "Esquive" : "Vitesse";
+        rowLabel.className = "label";
+        rowVal.textContent = getTotalStat(stat);
+        statsEl.appendChild(rowLabel);
+        statsEl.appendChild(rowVal);
+      });
+      document.getElementById("statPoints").textContent = hero.statPoints;
+
+      const fullHero = maxHP();
+      document.getElementById("heroHPText").textContent = `${fullHero} / ${fullHero}`;
+      document.getElementById("heroHPBarInner").style.width = "100%";
+    }
+
+    function renderStatButtons() {
+      const container = document.getElementById("statButtons");
+      container.innerHTML = "";
+      const stats = [
+        ["FOR", "Force"],
+        ["VIT", "Vitalité"],
+        ["PRE", "Précision"],
+        ["ESQ", "Esquive"],
+        ["VITZ", "Vitesse"]
+      ];
+      stats.forEach(([key, label]) => {
+        const btn = document.createElement("button");
+        btn.textContent = `+1 ${label}`;
+        btn.disabled = hero.statPoints <= 0;
+        btn.onclick = () => addStat(key);
+        container.appendChild(btn);
+      });
+    }
+
+    function addStat(statKey) {
+      if (hero.statPoints <= 0) return;
+      hero.stats[statKey] = (hero.stats[statKey] || 0) + 1;
+      hero.statPoints -= 1;
+      saveHero();
+      renderAll();
+    }
+
+    function renderEquipment() {
+      const el = document.getElementById("equipment");
+      const slots = [
+        ["weapon", "Arme"],
+        ["helmet", "Casque"],
+        ["armor", "Armure"],
+        ["boots", "Bottes"],
+        ["accessory", "Accessoire"]
+      ];
+      el.innerHTML = "";
+      slots.forEach(([key, label]) => {
+        const item = hero.equipment[key];
+        const div = document.createElement("div");
+        div.style.marginBottom = "6px";
+        const emoji = slotEmojis[key] || "📦";
+        if (!item) {
+          div.textContent = `${label} : (vide)`;
+        } else {
+          const rarity = getRarityById(item.rarityId || "common");
+          const stats = Object.entries(item)
+            .filter(([k]) => ["FOR","VIT","PRE","ESQ","VITZ"].includes(k))
+            .map(([k, v]) => `${k}+${v}`)
+            .join(", ");
+
+          const nameBox =
+            `<span style="
+              display:inline-block;
+              border-radius:6px;
+              border:2px solid ${rarity.color};
+              padding:0 6px;
+              margin-right:4px;
+              color:${rarity.color};
+              font-weight:600;
+            ">${item.name}</span>`;
+
+          const statsSpan = stats
+            ? ` <span style="font-size:12px;color:#555;">(${stats})</span>`
+            : "";
+
+          div.innerHTML =
+            `<strong>${label}</strong> : ${emoji} ${nameBox}${statsSpan}`;
+        }
+        el.appendChild(div);
+      });
+    }
+
+    function renderEnemy() {
+      const infoEl = document.getElementById("enemyInfo");
+      const statsEl = document.getElementById("enemyStats");
+      const bandEl = document.getElementById("enemyBand");
+      const enemyHPText = document.getElementById("enemyHPText");
+      const enemyHPBarInner = document.getElementById("enemyHPBarInner");
+
+      if (!currentEnemy) {
+        infoEl.textContent = "Aucun ennemi pour l'instant. Lance une mission ou un match d'arène.";
+        statsEl.textContent = "";
+        bandEl.textContent = "En attente";
+        enemyHPText.textContent = "—";
+        enemyHPBarInner.style.width = "0%";
+        return;
+      }
+      infoEl.innerHTML = `<strong>${currentEnemy.name}</strong> (Niv. ${currentEnemy.level})`;
+      statsEl.innerHTML =
+        `<span class="pill">FOR ${currentEnemy.FOR}</span>` +
+        `<span class="pill">VIT ${currentEnemy.VIT}</span>` +
+        `<span class="pill">PRE ${currentEnemy.PRE}</span>` +
+        `<span class="pill">ESQ ${currentEnemy.ESQ}</span>` +
+        `<span class="pill">VITZ ${currentEnemy.VITZ}</span>`;
+      bandEl.textContent = "En mission";
+
+      const fullEnemy = currentEnemy.VIT * 10;
+      enemyHPText.textContent = `${fullEnemy} / ${fullEnemy}`;
+      enemyHPBarInner.style.width = "100%";
+    }
+
+    function renderArena() {
+      const a = hero.arena || { rating: 0, wins: 0, losses: 0 };
+      const arenaInfo = document.getElementById("arenaInfo");
+      const rankName = getArenaRankName(a.rating);
+      const rankEmoji = getArenaRankEmoji(a.rating);
+      arenaInfo.innerHTML =
+        `<div class="arena-rank">Rang : ${rankEmoji} ${rankName}` +
+        `<span class="arena-rank-badge">${a.rating} pts</span></div>` +
+        `<div style="font-size:13px;margin-top:4px;">Victoires : ${a.wins} • Défaites : ${a.losses}</div>`;
+    }
+
+    function renderShop() {
+      const list = document.getElementById("shopItemsList");
+      if (!list) return;
+      list.innerHTML = "";
+      if (!hero.shop.items || hero.shop.items.length === 0) {
+        list.textContent = "Aucun objet pour le moment. Rafraîchis la boutique pour voir de nouveaux équipements.";
+        return;
+      }
+      hero.shop.items.forEach(offer => {
+        const rarity = getRarityById(offer.rarityId);
+        const emoji = slotEmojis[offer.slot] || "📦";
+        const statsText = Object.entries(offer.item)
+          .filter(([k]) => ["FOR","VIT","PRE","ESQ","VITZ"].includes(k))
+          .map(([k,v]) => `${k}+${v}`)
+          .join(", ");
+
+        const nameBox =
+          `<span style="
+            display:inline-block;
+            border-radius:6px;
+            border:2px solid ${rarity.color};
+            padding:0 6px;
+            margin-right:4px;
+            color:${rarity.color};
+            font-weight:600;
+          ">${offer.item.name}</span>`;
+
+        const statsSpan = statsText
+          ? ` <span style="font-size:12px;color:#4b5563;">(${statsText})</span>`
+          : "";
+
+        const line = document.createElement("div");
+        line.style.marginBottom = "4px";
+        line.innerHTML =
+          `${emoji} ${nameBox}${statsSpan} – ` +
+          `<span style="font-size:12px;">${offer.cost} pièces</span>`;
+
+        const btn = document.createElement("button");
+        btn.textContent = "Acheter";
+        btn.style.marginLeft = "6px";
+        btn.onclick = () => buyShopOffer(offer.id);
+        line.appendChild(btn);
+        list.appendChild(line);
+      });
+    }
+
+    function renderInventory() {
+      const list = document.getElementById("inventoryList");
+      if (!list) return;
+      list.innerHTML = "";
+      if (!hero.inventory || hero.inventory.length === 0) {
+        list.textContent = "Ton inventaire est vide pour l'instant.";
+        return;
+      }
+      hero.inventory.forEach(entry => {
+        const { id, slot, item } = entry;
+        const rarity = getRarityById(item.rarityId || "common");
+        const emoji = slotEmojis[slot] || "📦";
+        const statsText = Object.entries(item)
+          .filter(([k]) => ["FOR","VIT","PRE","ESQ","VITZ"].includes(k))
+          .map(([k,v]) => `${k}+${v}`)
+          .join(", ");
+        const slotLabel =
+          slot === "weapon" ? "Arme" :
+          slot === "helmet" ? "Casque" :
+          slot === "armor" ? "Armure" :
+          slot === "boots" ? "Bottes" :
+          "Accessoire";
+
+        const row = document.createElement("div");
+        row.style.marginBottom = "4px";
+
+        const nameBox =
+          `<span style="
+            display:inline-block;
+            border-radius:6px;
+            border:2px solid ${rarity.color};
+            padding:0 6px;
+            margin-right:4px;
+            color:${rarity.color};
+            font-weight:600;
+          ">${item.name}</span>`;
+
+        const statsSpan = statsText
+          ? ` <span style="font-size:12px;color:#4b5563;">(${statsText})</span>`
+          : "";
+
+        row.innerHTML =
+          `<span style="font-size:11px;color:#6b7280;">[${slotLabel}]</span> ` +
+          `${emoji} ${nameBox}${statsSpan}`;
+
+        const btn = document.createElement("button");
+        btn.textContent = "Équiper";
+        btn.style.marginLeft = "6px";
+        btn.onclick = () => equipFromInventory(id);
+        row.appendChild(btn);
+
+        list.appendChild(row);
+      });
+    }
+
+    function renderAll() {
+      ensureStructures();
+      if (hero.shop.items.length === 0) {
+        hero.shop.items = [];
+        for (let i = 0; i < 3; i++) hero.shop.items.push(generateShopOffer());
+      }
+      applyCurrentSkin();
+      renderHero();
+      renderStatButtons();
+      renderEquipment();
+      renderEnemy();
+      renderArena();
+      renderShop();
+      renderInventory();
+      renderCosmetics();
+      renderAchievements();
+      if (!combatContext || !combatContext.active) resetDuelBars();
+    }
+
+    function startMission(difficulty) {
+      clearLog();
+      log(`Tu lances une mission ${difficultyLabel(difficulty)}...`, "system");
+
+      const baseLevel = hero.level;
+      let levelMod = difficulty === "easy" ? 0 : difficulty === "normal" ? 1 : 2;
+      const enemyLevel = Math.max(1, baseLevel + levelMod);
+      const enemy = generateEnemy(enemyLevel, difficulty);
+      currentEnemy = enemy;
+      renderEnemy();
+
+      combatContext = { heroMaxHP: maxHP(), enemyMaxHP: enemy.VIT * 10, active: true };
+      updateDuelHP(combatContext.heroMaxHP, combatContext.enemyMaxHP);
+
+      log(`Adversaire : ${enemy.name} (Niv. ${enemy.level})`, "enemy");
+      const result = simulateCombat(enemy);
+
+      flushLogQueue(() => {
+        endBattle("story", difficulty, enemy, result);
+        flushLogQueue(() => {
+          combatContext.active = false;
+          saveHero();
+          renderAll();
+        });
+      });
+    }
+
+    function generateEnemy(level, difficulty) {
+      const namesEasy = ["Kevin le Caïd", "Zozo du Parking", "Lulu le Relou"];
+      const namesNormal = ["Bruno la Brute", "Momo du Quartier", "Sabrina la Sèche"];
+      const namesHard = ["Rex le Colosse", "La Muraille", "Le Bulldozer"];
+      let pool = difficulty === "easy" ? namesEasy : difficulty === "normal" ? namesNormal : namesHard;
+      const name = pool[Math.floor(Math.random()*pool.length)];
+      const scalar = 0.8 + (difficulty === "easy" ? 0 : difficulty === "normal" ? 0.15 : 0.35);
+
+      function randAround(base, spread) {
+        return Math.max(1, Math.round(base + (Math.random()*2 - 1)*spread));
+      }
+
+      return {
+        name,
+        level,
+        FOR: randAround(getTotalStat("FOR") * scalar, 2 + level),
+        VIT: randAround(getTotalStat("VIT") * scalar, 2 + level),
+        PRE: randAround(getTotalStat("PRE") * scalar, 2),
+        ESQ: randAround(getTotalStat("ESQ") * scalar, 2),
+        VITZ: randAround(getTotalStat("VITZ") * scalar, 2)
+      };
+    }
+
+    function startArenaBattle() {
+      clearLog();
+      log("Tu entres en match d'arène… la foule est en délire (dans ta tête). 🥊", "system");
+
+      const enemy = generateArenaEnemy();
+      currentEnemy = enemy;
+      renderEnemy();
+
+      combatContext = { heroMaxHP: maxHP(), enemyMaxHP: enemy.VIT * 10, active: true };
+      updateDuelHP(combatContext.heroMaxHP, combatContext.enemyMaxHP);
+
+      log(`Adversaire d'arène : ${enemy.name} (Niv. ${enemy.level})`, "enemy");
+      const result = simulateCombat(enemy);
+
+      flushLogQueue(() => {
+        endBattle("arena", null, enemy, result);
+        flushLogQueue(() => {
+          combatContext.active = false;
+          saveHero();
+          renderAll();
+        });
+      });
+    }
+
+    function generateArenaEnemy() {
+      const rating = hero.arena?.rating || 0;
+      const name = rand(arenaNames);
+      const levelOffset = Math.floor(rating / 300);
+      const level = Math.max(1, hero.level + levelOffset);
+
+      const scalar = 0.85 + Math.min(rating, 600) / 600 * 0.15;
+
+      function randAroundHero(statName, extraSpread = 0) {
+        const base = getTotalStat(statName) * scalar;
+        const spread = 1 + level + extraSpread;
+        return Math.max(1, Math.round(base + (Math.random()*2 - 1)*spread));
+      }
+
+      return {
+        name,
+        level,
+        FOR: Math.max(1, Math.round(randAroundHero("FOR") * 0.95)),
+        VIT: randAroundHero("VIT", 2),
+        PRE: Math.max(1, Math.round(randAroundHero("PRE") * 0.9)),
+        ESQ: randAroundHero("ESQ"),
+        VITZ: randAroundHero("VITZ")
+      };
+    }
+
+    // --- COMBAT AVEC GOD MODE ---
+    function simulateCombat(enemy) {
+      let heroHP = maxHP();
+      let enemyHP = enemy.VIT * 10;
+      log(`Tes PV : ${heroHP} • PV de ${enemy.name} : ${enemyHP}`, "system", heroHP, enemyHP);
+
+      let round = 1;
+      const maxRounds = 20;
+      while (heroHP > 0 && enemyHP > 0 && round <= maxRounds) {
+        log("", "system");
+        log(`--- Round ${round} ---`, "round");
+
+        const heroGoesFirst = getTotalStat("VITZ") >= enemy.VITZ;
+        if (heroGoesFirst) {
+          enemyHP = heroAttack(heroHP, enemyHP, enemy);
+          if (enemyHP <= 0) break;
+          heroHP = enemyAttack(heroHP, enemyHP, enemy);
+        } else {
+          heroHP = enemyAttack(heroHP, enemyHP, enemy);
+          if (heroHP <= 0) break;
+          enemyHP = heroAttack(heroHP, enemyHP, enemy);
+        }
+        round++;
+      }
+
+      // GOD MODE : quoi qu'il arrive, tu gagnes
+      if (GOD_MODE) {
+        enemyHP = 0;
+        log("", "system", heroHP, enemyHP);
+        log("Grâce au GOD MODE, tu termines le combat en totale domination. Victoire automatique. 😈", "hero");
+        return { outcome: "win", heroHP, enemyHP: 0 };
+      }
+
+      if (heroHP <= 0 && enemyHP <= 0) {
+        log("", "system", heroHP, enemyHP);
+        log("Match nul, vous tombez tous les deux K.O. 😵", "system");
+        return { outcome: "draw", heroHP: 0, enemyHP: 0 };
+      } else if (heroHP <= 0) {
+        log("", "system", heroHP, enemyHP);
+        log("Tu es K.O. 🥴", "enemy");
+        return { outcome: "lose", heroHP: 0, enemyHP };
+      } else if (enemyHP <= 0) {
+        log("", "system", heroHP, enemyHP);
+        log(`${enemy.name} est K.O., victoire ! 🥇`, "hero");
+        return { outcome: "win", heroHP, enemyHP: 0 };
+      } else {
+        log("", "system", heroHP, enemyHP);
+        log("Le combat se termine sans K.O. net.", "system");
+        return { outcome: "draw", heroHP, enemyHP };
+      }
+    }
+
+    function heroAttack(heroHP, enemyHP, enemy) {
+      let hitChance = 0.7 + (getTotalStat("PRE") - enemy.ESQ) * 0.02;
+      hitChance = Math.max(0.2, Math.min(0.95, hitChance));
+      if (Math.random() > hitChance) {
+        const txt = rand(heroMissTexts);
+        log(txt, "hero", heroHP, enemyHP);
+        return enemyHP;
+      }
+      const baseDamage = getTotalStat("FOR") * (0.9 + Math.random()*0.4);
+      let critChance = 0.1 + getTotalStat("PRE") * 0.015;
+      critChance = Math.max(0.05, Math.min(0.4, critChance));
+      let dmg = Math.round(baseDamage);
+      let crit = false;
+      if (Math.random() < critChance) {
+        crit = true;
+        dmg = Math.round(dmg * 1.7);
+        hero.progress.bestCrit = Math.max(hero.progress.bestCrit || 0, dmg);
+      }
+      enemyHP -= dmg;
+      const hpStr = Math.max(0, enemyHP);
+      if (crit) {
+        let txt = rand(heroCritTexts).replace("{dmg}", dmg).replace("{hp}", hpStr);
+        log(txt, "crit", heroHP, enemyHP);
+      } else {
+        let txt = rand(heroHitTexts).replace("{dmg}", dmg).replace("{hp}", hpStr);
+        log(txt, "hero", heroHP, enemyHP);
+      }
+      return enemyHP;
+    }
+
+    function enemyAttack(heroHP, enemyHP, enemy) {
+      // GOD MODE : tu ne prends aucun dégât
+      if (GOD_MODE) {
+        let txt = rand(enemyHitTexts)
+          .replace("{name}", enemy.name)
+          .replace("{dmg}", 0)
+          .replace("{hp}", heroHP);
+        log(txt + " (GOD MODE : tu ne prends aucun dégât)", "hero", heroHP, enemyHP);
+        return heroHP;
+      }
+
+      let hitChance = 0.7 + (enemy.PRE - getTotalStat("ESQ")) * 0.02;
+      hitChance = Math.max(0.2, Math.min(0.9, hitChance));
+      if (Math.random() > hitChance) {
+        let txt = rand(enemyMissTexts).replace("{name}", enemy.name);
+        log(txt, "hero", heroHP, enemyHP);
+        return heroHP;
+      }
+      const baseDamage = enemy.FOR * (0.8 + Math.random()*0.35);
+      let critChance = 0.1 + enemy.PRE * 0.015;
+      critChance = Math.max(0.05, Math.min(0.35, critChance));
+      let dmg = Math.round(baseDamage);
+      let crit = false;
+      if (Math.random() < critChance) {
+        crit = true;
+        dmg = Math.round(dmg * 1.7);
+      }
+      heroHP -= dmg;
+      const hpStr = Math.max(0, heroHP);
+      if (crit) {
+        let txt = rand(enemyCritTexts).replace("{name}", enemy.name).replace("{dmg}", dmg).replace("{hp}", hpStr);
+        log(txt, "crit", heroHP, enemyHP);
+      } else {
+        let txt = rand(enemyHitTexts).replace("{name}", enemy.name).replace("{dmg}", dmg).replace("{hp}", hpStr);
+        log(txt, "enemy", heroHP, enemyHP);
+      }
+      return heroHP;
+    }
+
+    function endBattle(mode, difficulty, enemy, result) {
+      if (mode === "story") {
+        let baseXP = difficulty === "easy" ? 5 : difficulty === "normal" ? 8 : 12;
+        let baseCoins = difficulty === "easy" ? 10 : difficulty === "normal" ? 18 : 28;
+
+        if (result.outcome === "win") {
+          log("", "system", result.heroHP, result.enemyHP);
+          log(`Récompenses : +${baseXP} XP, +${baseCoins} pièces.`, "loot");
+          hero.xp += baseXP;
+          hero.coins += baseCoins;
+          hero.progress.storyWins = (hero.progress.storyWins || 0) + 1;
+          maybeDropLoot(difficulty);
+        } else if (result.outcome === "draw") {
+          log("", "system", result.heroHP, result.enemyHP);
+          log(`Tu apprends un peu de ce combat : +${Math.round(baseXP/2)} XP.`, "loot");
+          hero.xp += Math.round(baseXP/2);
+        } else {
+          log("", "system", result.heroHP, result.enemyHP);
+          log("Pas de récompense, mais tu feras mieux la prochaine fois.", "system");
+        }
+      } else if (mode === "arena") {
+        const a = hero.arena || (hero.arena = { rating: 0, wins: 0, losses: 0 });
+        if (result.outcome === "win") {
+          const xp = 8, coins = 15, gain = 20;
+          log("", "system", result.heroHP, result.enemyHP);
+          log(`Victoire en arène : +${xp} XP, +${coins} pièces, +${gain} points d'arène.`, "loot");
+          hero.xp += xp;
+          hero.coins += coins;
+          a.rating += gain;
+          a.wins += 1;
+          hero.progress.arenaWins = (hero.progress.arenaWins || 0) + 1;
+        } else if (result.outcome === "lose") {
+          const loss = 10;
+          log("", "system", result.heroHP, result.enemyHP);
+          log(`Défaite en arène : tu perds ${loss} points d'arène.`, "system");
+          a.rating = Math.max(0, a.rating - loss);
+          a.losses += 1;
+        } else {
+          const xp = 4;
+          log("", "system", result.heroHP, result.enemyHP);
+          log(`Match nul en arène : +${xp} XP, pas de changement de rang.`, "loot");
+          hero.xp += xp;
+        }
+        hero.progress.arenaRatingBest = Math.max(hero.progress.arenaRatingBest || 0, hero.arena.rating || 0);
+      }
+
+      while (hero.xp >= hero.xpToNext && hero.level < LEVEL_CAP) {
+        hero.xp -= hero.xpToNext;
+        hero.level += 1;
+        hero.xpToNext = Math.round(hero.xpToNext * 1.4);
+        hero.statPoints += 3;
+        hero.progress.maxLevel = Math.max(hero.progress.maxLevel || 0, hero.level);
+        log("", "system");
+        log(`🔥 TU PASSES NIVEAU ${hero.level} ! Tu gagnes 3 points de stats à répartir.`, "loot");
+      }
+
+      if (hero.level >= LEVEL_CAP && hero.xp >= hero.xpToNext) {
+        hero.xp = hero.xpToNext;
+        log("", "system");
+        log(`Tu es au niveau max (${LEVEL_CAP}). L'XP supplémentaire ne te fait plus monter pour l'instant.`, "system");
+      }
+
+      checkAchievements();
+    }
+
+    function maybeDropLoot(difficulty) {
+      const roll = Math.random();
+      const chance = difficulty === "easy" ? 0.25 : difficulty === "normal" ? 0.45 : 0.7;
+      if (roll > chance) return;
+
+      const res = generateRandomItem();
+      const slot = res.slot;
+      const newItem = res.item;
+      const rarity = getRarityById(res.rarityId);
+      const emoji = slotEmojis[slot] || "📦";
+
+      log("", "system");
+      log(`💎 Tu trouves un objet : ${emoji} ${newItem.name} [${rarity.name}]`, "loot");
+      handleNewEquipment(slot, newItem, "Butin");
+    }
+
+    ensureStructures();
+    renderAll();
+    clearLog();
+    log("Bienvenue dans Cartoon Clash Arena ! Lance une mission ou un match d'arène. 🥊", "system");
+    flushLogQueue();
+  </script>
+</body>
+</html>
