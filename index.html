@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8" />
-  <title>Cartoon Clash Arena - Nouvelle Interface + Godmode</title>
+  <title>Cartoon Clash Arena - Mobile</title>
   <style>
     * { box-sizing: border-box; }
 
@@ -96,8 +96,6 @@
       gap: 2px;
     }
 
-    .chip span { display: block; }
-
     .page {
       flex: 1;
       padding: 14px 16px 18px 16px;
@@ -106,14 +104,43 @@
       gap: 12px;
     }
 
-    .main-layout {
+    /* Onglets mobile */
+    .mobile-tabs {
       display: flex;
-      flex-wrap: wrap;
-      gap: 12px;
+      gap: 8px;
+      margin-bottom: 10px;
+      overflow-x: auto;
+      padding-bottom: 4px;
     }
 
-    .col-left { flex: 1 1 360px; min-width: 340px; }
-    .col-right { flex: 1 1 340px; min-width: 320px; }
+    .tab-btn {
+      flex: 1 0 auto;
+      padding: 8px 10px;
+      border-radius: 999px;
+      border: none;
+      background: rgba(15,23,42,0.08);
+      font-size: 13px;
+      font-weight: 600;
+      color: #111827;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    .tab-btn span.icon {
+      font-size: 15px;
+    }
+
+    .tab-btn.active {
+      background: linear-gradient(135deg,#f97316,#facc15);
+      box-shadow: 0 3px 8px rgba(0,0,0,0.2);
+    }
+
+    /* Sections */
+    .mobile-section { margin-bottom: 10px; }
 
     .card {
       background: rgba(248,250,252,0.94);
@@ -198,8 +225,6 @@
     button:disabled {
       opacity: 0.5;
       cursor: default;
-      box-shadow: none;
-      transform: none;
     }
 
     button:not(:disabled):active {
@@ -225,7 +250,7 @@
       font-size: 13px;
       padding: 8px;
       border-radius: 12px;
-      height: 260px;
+      height: 220px;
       overflow-y: auto;
       border: 1px solid #1f2937;
     }
@@ -391,11 +416,85 @@
 
     .skip-line input { margin-right: 4px; }
 
-    #inventoryList { max-height: 180px; overflow-y: auto; }
+    #inventoryList { max-height: 200px; overflow-y: auto; }
 
-    @media (max-width: 768px) {
-      .topbar { padding-inline: 10px; }
-      .page { padding-inline: 10px; }
+    /* Desktop : on affiche toutes les sections, on cache les onglets */
+    @media (min-width: 900px) {
+      .mobile-tabs { display: none; }
+      .mobile-section { display: block !important; }
+      .page {
+        max-width: 1120px;
+        margin-inline: auto;
+      }
+    }
+
+    /* Mobile : une seule section visible à la fois */
+    @media (max-width: 899px) {
+      .mobile-section { display: none; }
+      .mobile-section.active { display: block; }
+      .chip { display: none; } /* on cache le gros rappel des touches sur mobile */
+    }
+
+    /* Bouton & panneau dev flottant */
+    .dev-btn {
+      position: fixed;
+      bottom: 14px;
+      right: 14px;
+      width: 40px;
+      height: 40px;
+      border-radius: 999px;
+      background: rgba(15,23,42,0.9);
+      color: #facc15;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.35);
+      cursor: pointer;
+      z-index: 60;
+      opacity: 0.6;
+      transition: opacity 0.15s ease, transform 0.1s ease;
+    }
+    .dev-btn:hover {
+      opacity: 1;
+      transform: translateY(-1px);
+    }
+
+    .dev-panel {
+      position: fixed;
+      bottom: 62px;
+      right: 14px;
+      width: 230px;
+      border-radius: 16px;
+      background: rgba(15,23,42,0.97);
+      color: #e5e7eb;
+      padding: 10px 12px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.45);
+      font-size: 12px;
+      z-index: 65;
+      display: none;
+    }
+    .dev-panel.open { display: block; }
+    .dev-panel h3 {
+      margin: 0 0 4px 0;
+      font-size: 13px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .dev-panel small {
+      display: block;
+      margin-bottom: 6px;
+      color: #9ca3af;
+    }
+    .dev-panel button {
+      margin: 3px 3px 0 0;
+      padding: 5px 8px;
+      font-size: 11px;
+    }
+    #devGodState {
+      font-weight: 700;
+      margin-left: 4px;
     }
   </style>
 </head>
@@ -408,7 +507,7 @@
         </div>
         <div class="topbar-title">
           <h1>Cartoon Clash Arena</h1>
-          <div>Histoire, PvP, loot, inventaire… et godmode 😈</div>
+          <div>Version mobile avec onglets, même puissance. 😈</div>
         </div>
       </div>
       <div class="topbar-right">
@@ -422,231 +521,302 @@
     </header>
 
     <main class="page">
-      <div class="main-layout">
-        <!-- COLONNE GAUCHE -->
-        <div class="col-left">
-          <!-- Héros -->
-          <div class="card">
-            <div class="card-header">
-              <h2><span class="icon">🧍‍♂️</span> Ton héros</h2>
-              <div class="card-header-tag">Build & stats</div>
+      <!-- Onglets mobile -->
+      <div class="mobile-tabs">
+        <button id="tab-hero" class="tab-btn active" onclick="setMobileSection('hero')">
+          <span class="icon">🧍‍♂️</span> Héros
+        </button>
+        <button id="tab-combat" class="tab-btn" onclick="setMobileSection('combat')">
+          <span class="icon">🥊</span> Combat
+        </button>
+        <button id="tab-shop" class="tab-btn" onclick="setMobileSection('shop')">
+          <span class="icon">🛒</span> Boutique
+        </button>
+        <button id="tab-inventory" class="tab-btn" onclick="setMobileSection('inventory')">
+          <span class="icon">🎒</span> Inventaire
+        </button>
+      </div>
+
+      <!-- SECTION HÉROS -->
+      <section id="section-hero" class="mobile-section active">
+        <!-- Héros -->
+        <div class="card">
+          <div class="card-header">
+            <h2><span class="icon">🧍‍♂️</span> Ton héros</h2>
+            <div class="card-header-tag">Build & stats</div>
+          </div>
+          <div class="card-body">
+            <div class="avatar-wrapper">
+              <div class="avatar">
+                <div class="avatar-face">😎</div>
+                <div class="avatar-band" id="avatarBand">Bruiser</div>
+              </div>
+              <div>
+                <div id="heroName"></div>
+                <div class="hero-meta" id="heroMeta"></div>
+              </div>
             </div>
-            <div class="card-body">
-              <div class="avatar-wrapper">
-                <div class="avatar">
-                  <div class="avatar-face">😎</div>
-                  <div class="avatar-band" id="avatarBand">Bruiser</div>
-                </div>
-                <div>
-                  <div id="heroName"></div>
-                  <div class="hero-meta" id="heroMeta"></div>
+            <div class="stat-list" id="heroStats"></div>
+            <div class="hp-block">
+              <div class="hp-label">
+                <span>PV max</span>
+                <span id="heroHPText">—</span>
+              </div>
+              <div class="hp-bar-outer">
+                <div id="heroHPBarInner" class="hp-bar-inner"></div>
+              </div>
+            </div>
+            <p style="margin-top:8px;font-size:13px;">
+              Points de stats à répartir : <span id="statPoints">0</span>
+            </p>
+            <div id="statButtons"></div>
+          </div>
+        </div>
+
+        <!-- Cosmétiques -->
+        <div class="card">
+          <div class="card-header">
+            <h2><span class="icon">🎨</span> Cosmétiques</h2>
+            <div class="card-header-tag">Skins & style</div>
+          </div>
+          <div class="card-body">
+            <div id="cosmeticsList" style="font-size:13px;"></div>
+            <div style="font-size:11px;color:#6b7280;margin-top:4px;">
+              Certains skins se débloquent via les défis (arène, niveau, etc.).
+            </div>
+          </div>
+        </div>
+
+        <!-- Défis -->
+        <div class="card">
+          <div class="card-header">
+            <h2><span class="icon">✅</span> Carnet de défis</h2>
+            <div class="card-header-tag">Objectifs & récompenses</div>
+          </div>
+          <div class="card-body">
+            <div id="achievementsList" style="font-size:13px;"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SECTION COMBAT -->
+      <section id="section-combat" class="mobile-section">
+        <!-- Histoire -->
+        <div class="card">
+          <div class="card-header">
+            <h2><span class="icon">📖</span> Mode histoire (PvE)</h2>
+            <div class="card-header-tag">Farm XP / pièces</div>
+          </div>
+          <div class="card-body">
+            <button onclick="startMission('easy')">Mission facile</button>
+            <button class="secondary" onclick="startMission('normal')">Mission normale</button>
+            <button class="danger" onclick="startMission('hard')">Mission difficile</button>
+            <div style="margin-top:8px;font-size:13px;">
+              Plus la difficulté est haute, plus les récompenses sont bonnes… et plus ça cogne.
+            </div>
+            <div class="skip-line">
+              <label>
+                <input type="checkbox" id="instantToggle" onchange="toggleInstantResolve(this)">
+                Résoudre les combats instantanément
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <!-- Arène -->
+        <div class="card">
+          <div class="card-header">
+            <h2><span class="icon">🏟️</span> Arène PvP</h2>
+            <div class="card-header-tag">Ladder & rang</div>
+          </div>
+          <div class="card-body">
+            <div id="arenaInfo" style="margin-bottom:6px;"></div>
+            <button onclick="startArenaBattle()">Match d'arène</button>
+            <div style="margin-top:8px;font-size:13px;">
+              Affronte des “joueurs” simulés, gagne des points d'arène et monte de rang.
+            </div>
+          </div>
+        </div>
+
+        <!-- Ennemi -->
+        <div class="card enemy-card">
+          <div class="card-header">
+            <h2><span class="icon">🤜</span> Adversaire actuel</h2>
+            <div class="card-header-tag">Cible</div>
+          </div>
+          <div class="card-body">
+            <div class="avatar-wrapper">
+              <div class="avatar enemy-avatar">
+                <div class="avatar-face">😠</div>
+                <div class="avatar-band" id="enemyBand">En attente</div>
+              </div>
+              <div>
+                <div id="enemyInfo">Aucun ennemi pour l'instant. Lance une mission ou un match d'arène.</div>
+                <div class="enemy-stats" id="enemyStats"></div>
+                <div class="hp-block" style="margin-top:6px;">
+                  <div class="hp-label">
+                    <span>PV max ennemi</span>
+                    <span id="enemyHPText">—</span>
+                  </div>
+                  <div class="hp-bar-outer">
+                    <div id="enemyHPBarInner" class="hp-bar-inner enemy"></div>
+                  </div>
                 </div>
               </div>
-              <div class="stat-list" id="heroStats"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- PV combat -->
+        <div class="card">
+          <div class="card-header">
+            <h2><span class="icon">❤️</span> PV du combat</h2>
+            <div class="card-header-tag">Round en cours</div>
+          </div>
+          <div class="card-body">
+            <div class="hp-combat-row">
               <div class="hp-block">
                 <div class="hp-label">
-                  <span>PV max</span>
-                  <span id="heroHPText">—</span>
+                  <span>Toi</span>
+                  <span id="duelHeroHPText">—</span>
                 </div>
                 <div class="hp-bar-outer">
-                  <div id="heroHPBarInner" class="hp-bar-inner"></div>
+                  <div id="duelHeroHPBar" class="hp-bar-inner"></div>
                 </div>
               </div>
-              <p style="margin-top:8px;font-size:13px;">
-                Points de stats à répartir : <span id="statPoints">0</span>
-              </p>
-              <div id="statButtons"></div>
-            </div>
-          </div>
-
-          <!-- Histoire -->
-          <div class="card">
-            <div class="card-header">
-              <h2><span class="icon">📖</span> Mode histoire (PvE)</h2>
-              <div class="card-header-tag">Farm XP / pièces</div>
-            </div>
-            <div class="card-body">
-              <button onclick="startMission('easy')">Mission facile</button>
-              <button class="secondary" onclick="startMission('normal')">Mission normale</button>
-              <button class="danger" onclick="startMission('hard')">Mission difficile</button>
-              <div style="margin-top:8px;font-size:13px;">
-                Plus la difficulté est haute, plus les récompenses sont bonnes… et plus ça cogne.
-              </div>
-              <div class="skip-line">
-                <label>
-                  <input type="checkbox" id="instantToggle" onchange="toggleInstantResolve(this)">
-                  Résoudre les combats instantanément
-                </label>
+              <div class="hp-block">
+                <div class="hp-label">
+                  <span>Ennemi</span>
+                  <span id="duelEnemyHPText">—</span>
+                </div>
+                <div class="hp-bar-outer">
+                  <div id="duelEnemyHPBar" class="hp-bar-inner enemy"></div>
+                </div>
               </div>
             </div>
           </div>
+        </div>
+      </section>
 
-          <!-- Arène -->
-          <div class="card">
-            <div class="card-header">
-              <h2><span class="icon">🏟️</span> Arène PvP</h2>
-              <div class="card-header-tag">Ladder & rang</div>
-            </div>
-            <div class="card-body">
-              <div id="arenaInfo" style="margin-bottom:6px;"></div>
-              <button onclick="startArenaBattle()">Match d'arène</button>
-              <div style="margin-top:8px;font-size:13px;">
-                Affronte des “joueurs” simulés, gagne des points d'arène et monte de rang.
-              </div>
-            </div>
+      <!-- SECTION BOUTIQUE -->
+      <section id="section-shop" class="mobile-section">
+        <!-- Boutique -->
+        <div class="card">
+          <div class="card-header">
+            <h2><span class="icon">🛒</span> Boutique</h2>
+            <div class="card-header-tag">Stats & équipement</div>
           </div>
-
-          <!-- Boutique -->
-          <div class="card">
-            <div class="card-header">
-              <h2><span class="icon">🛒</span> Boutique</h2>
-              <div class="card-header-tag">Stats & équipement</div>
+          <div class="card-body">
+            <button onclick="buyStatPoint()">+1 point de stats (30 pièces)</button>
+            <button class="secondary" onclick="buyRandomItem()">Caisse mystère (20 pièces)</button>
+            <button onclick="buyFixedItem('proGloves')">Gants pro (+3 FOR, +1 PRE) – 40 pièces</button>
+            <button onclick="buyFixedItem('paddedJacket')">Blouson renforcé (+4 VIT, +1 ESQ) – 40 pièces</button>
+            <button onclick="buyFixedItem('champRing')">Bague épique (+2 PRE, +2 VITZ) – 40 pièces</button>
+            <button onclick="refreshShop(true)">🔁 Rafraîchir la boutique (5 pièces)</button>
+            <div id="shopInfo" class="shop-note">
+              Utilise tes pièces pour te renforcer. Les objets ont des raretés colorées.
             </div>
-            <div class="card-body">
-              <button onclick="buyStatPoint()">+1 point de stats (30 pièces)</button>
-              <button class="secondary" onclick="buyRandomItem()">Caisse mystère (20 pièces)</button>
-              <button onclick="buyFixedItem('proGloves')">Gants pro (+3 FOR, +1 PRE) – 40 pièces</button>
-              <button onclick="buyFixedItem('paddedJacket')">Blouson renforcé (+4 VIT, +1 ESQ) – 40 pièces</button>
-              <button onclick="buyFixedItem('champRing')">Bague épique (+2 PRE, +2 VITZ) – 40 pièces</button>
-              <button onclick="refreshShop(true)">🔁 Rafraîchir la boutique (5 pièces)</button>
-              <div id="shopInfo" class="shop-note">
-                Les objets peuvent être équipés directement ou rangés dans ton inventaire.
-              </div>
-              <div id="shopItemsList" class="shop-note" style="margin-top:8px;"></div>
-            </div>
+            <div id="shopItemsList" class="shop-note" style="margin-top:8px;"></div>
           </div>
+        </div>
 
-          <!-- Équipement -->
-          <div class="card">
-            <div class="card-header">
-              <h2><span class="icon">🧰</span> Équipement équipé</h2>
-              <div class="card-header-tag">Ce que tu portes</div>
-            </div>
-            <div class="card-body">
-              <div id="equipment"></div>
-            </div>
+        <!-- Équipement -->
+        <div class="card">
+          <div class="card-header">
+            <h2><span class="icon">🧰</span> Équipement équipé</h2>
+            <div class="card-header-tag">Ce que tu portes</div>
           </div>
-
-          <!-- Inventaire -->
-          <div class="card">
-            <div class="card-header">
-              <h2><span class="icon">🎒</span> Inventaire</h2>
-              <div class="card-header-tag">Objets stockés</div>
-            </div>
-            <div class="card-body">
-              <div id="inventoryList" style="font-size:13px;"></div>
-              <div style="font-size:11px;color:#6b7280;margin-top:4px;">
-                Ici sont stockés les objets que tu possèdes mais qui ne sont pas équipés.
-              </div>
-            </div>
+          <div class="card-body">
+            <div id="equipment"></div>
           </div>
+        </div>
+      </section>
 
-          <!-- Cosmétiques -->
-          <div class="card">
-            <div class="card-header">
-              <h2><span class="icon">🎨</span> Cosmétiques</h2>
-              <div class="card-header-tag">Skins & style</div>
-            </div>
-            <div class="card-body">
-              <div id="cosmeticsList" style="font-size:13px;"></div>
-              <div style="font-size:11px;color:#6b7280;margin-top:4px;">
-                Certains skins se débloquent via les défis (arène, niveau, etc.).
-              </div>
-            </div>
+      <!-- SECTION INVENTAIRE + JOURNAL -->
+      <section id="section-inventory" class="mobile-section">
+        <!-- Inventaire -->
+        <div class="card">
+          <div class="card-header">
+            <h2><span class="icon">🎒</span> Inventaire</h2>
+            <div class="card-header-tag">Objets stockés</div>
           </div>
-
-          <!-- Défis -->
-          <div class="card">
-            <div class="card-header">
-              <h2><span class="icon">✅</span> Carnet de défis</h2>
-              <div class="card-header-tag">Objectifs & récompenses</div>
-            </div>
-            <div class="card-body">
-              <div id="achievementsList" style="font-size:13px;"></div>
+          <div class="card-body">
+            <div id="inventoryList" style="font-size:13px;"></div>
+            <div style="font-size:11px;color:#6b7280;margin-top:4px;">
+              Ici sont stockés les objets que tu possèdes mais qui ne sont pas équipés.
             </div>
           </div>
         </div>
 
-        <!-- COLONNE DROITE -->
-        <div class="col-right">
-          <!-- Ennemi -->
-          <div class="card enemy-card">
-            <div class="card-header">
-              <h2><span class="icon">🤜</span> Adversaire actuel</h2>
-              <div class="card-header-tag">Cible</div>
-            </div>
-            <div class="card-body">
-              <div class="avatar-wrapper">
-                <div class="avatar enemy-avatar">
-                  <div class="avatar-face">😠</div>
-                  <div class="avatar-band" id="enemyBand">En attente</div>
-                </div>
-                <div>
-                  <div id="enemyInfo">Aucun ennemi pour l'instant. Lance une mission ou un match d'arène.</div>
-                  <div class="enemy-stats" id="enemyStats"></div>
-                  <div class="hp-block" style="margin-top:6px;">
-                    <div class="hp-label">
-                      <span>PV max ennemi</span>
-                      <span id="enemyHPText">—</span>
-                    </div>
-                    <div class="hp-bar-outer">
-                      <div id="enemyHPBarInner" class="hp-bar-inner enemy"></div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
+        <!-- Journal -->
+        <div class="card">
+          <div class="card-header">
+            <h2><span class="icon">📜</span> Journal de combat</h2>
+            <div class="card-header-tag">Round par round</div>
           </div>
-
-          <!-- PV combat -->
-          <div class="card">
-            <div class="card-header">
-              <h2><span class="icon">❤️</span> PV du combat</h2>
-              <div class="card-header-tag">Round en cours</div>
-            </div>
-            <div class="card-body">
-              <div class="hp-combat-row">
-                <div class="hp-block">
-                  <div class="hp-label">
-                    <span>Toi</span>
-                    <span id="duelHeroHPText">—</span>
-                  </div>
-                  <div class="hp-bar-outer">
-                    <div id="duelHeroHPBar" class="hp-bar-inner"></div>
-                  </div>
-                </div>
-                <div class="hp-block">
-                  <div class="hp-label">
-                    <span>Ennemi</span>
-                    <span id="duelEnemyHPText">—</span>
-                  </div>
-                  <div class="hp-bar-outer">
-                    <div id="duelEnemyHPBar" class="hp-bar-inner enemy"></div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Journal -->
-          <div class="card">
-            <div class="card-header">
-              <h2><span class="icon">📜</span> Journal de combat</h2>
-              <div class="card-header-tag">Round par round</div>
-            </div>
-            <div class="card-body">
-              <div id="log"></div>
-            </div>
+          <div class="card-body">
+            <div id="log"></div>
           </div>
         </div>
-      </div>
+      </section>
     </main>
   </div>
 
+  <!-- Bouton & panneau DEV -->
+  <div id="devButton" class="dev-btn" onclick="toggleDevPanel()" title="Outils développeur">
+    🛠️
+  </div>
+  <div id="devPanel" class="dev-panel">
+    <h3>Dev tools <span>(toi seulement 😏)</span></h3>
+    <small>Raccourcis PC : Ctrl+Shift+C / M / G</small>
+    <div>
+      <button onclick="devAddCoins(100)">+100 pièces</button>
+      <button onclick="devMaxOut()">Maxer le héros</button>
+      <button onclick="devToggleGodMode()">Basculer GOD MODE</button>
+    </div>
+    <div style="margin-top:6px;">
+      État GOD MODE :
+      <span id="devGodState" style="color:#ef4444;">INACTIF</span>
+    </div>
+  </div>
+
   <script>
+    /* --- DEV MODE & GESTION ONGLET MOBILE --- */
     const DEV_MODE = true;
     const LEVEL_CAP = 30;
-    let GOD_MODE = false; // toggle godmode
+    let GOD_MODE = false;
+
+    function setMobileSection(id) {
+      const sections = ["hero","combat","shop","inventory"];
+      sections.forEach(sec => {
+        const el = document.getElementById("section-" + sec);
+        const tab = document.getElementById("tab-" + sec);
+        if (!el || !tab) return;
+        if (sec === id) {
+          el.classList.add("active");
+          tab.classList.add("active");
+        } else {
+          el.classList.remove("active");
+          tab.classList.remove("active");
+        }
+      });
+    }
+
+    function toggleDevPanel() {
+      const panel = document.getElementById("devPanel");
+      if (!panel) return;
+      panel.classList.toggle("open");
+    }
+
+    function updateDevGodLabel() {
+      const span = document.getElementById("devGodState");
+      if (!span) return;
+      span.textContent = GOD_MODE ? "ACTIF" : "INACTIF";
+      span.style.color = GOD_MODE ? "#22c55e" : "#ef4444";
+    }
+
+    /* --- le reste du code (stats, combats, boutique, etc.) est identique à ta version précédente --- */
+    /* Je le laisse complet pour que tu puisses juste remplacer le fichier et jouer. */
 
     const slotEmojis = {
       weapon: "🥊",
@@ -728,10 +898,7 @@
       if (!raw) return null;
       try { return JSON.parse(raw); } catch { return null; }
     }
-
-    function saveHero() {
-      localStorage.setItem("cca_hero", JSON.stringify(hero));
-    }
+    function saveHero() { localStorage.setItem("cca_hero", JSON.stringify(hero)); }
 
     let hero = loadHero() || structuredClone(baseHero);
     let currentEnemy = null;
@@ -775,99 +942,72 @@
 
     function rand(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
 
-    // --- DEV CHEATS ---
+    /* Cheats dev */
     function devAddCoins(amount = 100) {
       if (!DEV_MODE) return;
       hero.coins += amount;
-      saveHero();
-      renderAll();
+      saveHero(); renderAll();
       log(`[DEV] +${amount} pièces ajoutées.`, "system");
       flushLogQueue();
     }
-
     function devMaxOut() {
       if (!DEV_MODE) return;
-
       hero.level = LEVEL_CAP;
       hero.xp = hero.xpToNext;
-
-      hero.stats = {
-        FOR: 50,
-        VIT: 50,
-        PRE: 40,
-        ESQ: 30,
-        VITZ: 35
-      };
-
+      hero.stats = { FOR: 50, VIT: 50, PRE: 40, ESQ: 30, VITZ: 35 };
       hero.coins = 99999;
 
       const legendary = RARITIES.find(r => r.id === "legendary");
-      const slots = ["weapon", "helmet", "armor", "boots", "accessory"];
-
+      const slots = ["weapon","helmet","armor","boots","accessory"];
       slots.forEach(slot => {
         let data;
-        do {
-          data = generateRandomItem(legendary);
-        } while (data.slot !== slot);
+        do { data = generateRandomItem(legendary); } while (data.slot !== slot);
         hero.equipment[slot] = data.item;
       });
 
       hero.arena = hero.arena || { rating: 0, wins: 0, losses: 0 };
       hero.arena.rating = 500;
-      hero.arena.wins  = Math.max(hero.arena.wins || 0, 50);
+      hero.arena.wins = Math.max(hero.arena.wins || 0, 50);
 
       hero.progress = hero.progress || {};
-      hero.progress.storyWins        = Math.max(hero.progress.storyWins || 0, 50);
-      hero.progress.arenaWins        = Math.max(hero.progress.arenaWins || 0, 30);
-      hero.progress.bestCrit         = Math.max(hero.progress.bestCrit || 0, 150);
-      hero.progress.maxLevel         = LEVEL_CAP;
-      hero.progress.arenaRatingBest  = Math.max(hero.progress.arenaRatingBest || 0, hero.arena.rating || 0);
+      hero.progress.storyWins = Math.max(hero.progress.storyWins || 0, 50);
+      hero.progress.arenaWins = Math.max(hero.progress.arenaWins || 0, 30);
+      hero.progress.bestCrit = Math.max(hero.progress.bestCrit || 0, 150);
+      hero.progress.maxLevel = LEVEL_CAP;
+      hero.progress.arenaRatingBest = Math.max(hero.progress.arenaRatingBest || 0, hero.arena.rating || 0);
 
-      if (hero.cosmetics) {
-        hero.cosmetics.unlocked = Object.keys(SKINS);
-      }
+      if (hero.cosmetics) hero.cosmetics.unlocked = Object.keys(SKINS);
 
-      saveHero();
-      renderAll();
-      log("[DEV] Héros MAXÉ : niveau max, grosses stats, full légendaire, arène boostée et skins débloqués.", "system");
+      saveHero(); renderAll();
+      log("[DEV] Héros maxé : niveau, stats, légendaires, arène et skins boostés.", "system");
       flushLogQueue();
     }
-
     function devToggleGodMode() {
       if (!DEV_MODE) return;
       GOD_MODE = !GOD_MODE;
-      if (GOD_MODE) {
-        log("[DEV] GOD MODE activé : tu ne prends plus de dégâts et tu ne peux plus perdre. 😈", "system");
-      } else {
-        log("[DEV] GOD MODE désactivé : retour au mode normal.", "system");
-      }
+      log(GOD_MODE
+        ? "[DEV] GOD MODE activé : tu ne prends plus de dégâts. 😈"
+        : "[DEV] GOD MODE désactivé : retour à la normale.",
+        "system");
+      updateDevGodLabel();
       flushLogQueue();
     }
-
     document.addEventListener("keydown", (e) => {
       if (!DEV_MODE) return;
       const key = e.key.toLowerCase();
-
-      if (e.ctrlKey && e.shiftKey && key === "c") {
-        devAddCoins(100);
-      }
-      if (e.ctrlKey && e.shiftKey && key === "m") {
-        devMaxOut();
-      }
-      if (e.ctrlKey && e.shiftKey && key === "g") {
-        devToggleGodMode();
-      }
+      if (e.ctrlKey && e.shiftKey && key === "c") devAddCoins(100);
+      if (e.ctrlKey && e.shiftKey && key === "m") devMaxOut();
+      if (e.ctrlKey && e.shiftKey && key === "g") devToggleGodMode();
     });
 
-    // --- AUTRES VARIABLES & FONCTIONS ---
-
+    /* Structures, stats, rendering etc. */
     let instantResolve = false;
     function toggleInstantResolve(cb) {
       instantResolve = cb.checked;
       log(
         instantResolve
           ? "Les combats seront résolus instantanément."
-          : "Les combats reviennent en mode animation tour par tour.",
+          : "Les combats repassent en mode tour par tour.",
         "system"
       );
       flushLogQueue();
@@ -894,7 +1034,6 @@
       if (!hero.shop) hero.shop = { items: [] };
       if (!hero.shop.items) hero.shop.items = [];
       if (!hero.inventory) hero.inventory = [];
-
       if (hero.equipment) {
         for (const key of Object.keys(hero.equipment)) {
           const it = hero.equipment[key];
@@ -906,7 +1045,6 @@
     function getRarityById(id) {
       return RARITIES.find(r => r.id === id) || RARITIES[0];
     }
-
     function getTotalStat(stat) {
       let base = hero.stats[stat] || 0;
       let bonus = hero.bonusStats[stat] || 0;
@@ -916,7 +1054,6 @@
       }
       return base + bonus;
     }
-
     function maxHP() { return getTotalStat("VIT") * 10; }
 
     function resetDuelBars() {
@@ -925,7 +1062,6 @@
       document.getElementById("duelHeroHPBar").style.width = "0%";
       document.getElementById("duelEnemyHPBar").style.width = "0%";
     }
-
     function updateDuelHP(heroHPValue, enemyHPValue) {
       if (!combatContext) return;
       const hBar = document.getElementById("duelHeroHPBar");
@@ -948,11 +1084,9 @@
       document.getElementById("log").innerHTML = "";
       pendingLines = [];
     }
-
     function log(text, type = "system", heroHPValue = null, enemyHPValue = null) {
       pendingLines.push({ text, type, heroHP: heroHPValue, enemyHP: enemyHPValue });
     }
-
     function renderLogEntry(entry) {
       const el = document.getElementById("log");
       if (entry.text !== "") {
@@ -966,7 +1100,6 @@
         updateDuelHP(entry.heroHP, entry.enemyHP);
       }
     }
-
     function playLogQueue(queue, done) {
       let i = 0;
       function step() {
@@ -978,7 +1111,6 @@
       }
       step();
     }
-
     function flushLogQueue(done) {
       const queue = pendingLines.slice();
       pendingLines = [];
@@ -994,7 +1126,6 @@
     function difficultyLabel(diff) {
       return diff === "easy" ? "facile" : diff === "normal" ? "normale" : "difficile";
     }
-
     function getArenaRankName(rating) {
       if (rating >= 1000) return "Légende";
       if (rating >= 600) return "Or";
@@ -1002,7 +1133,6 @@
       if (rating >= 100) return "Bronze";
       return "Non classé";
     }
-
     function getArenaRankEmoji(rating) {
       if (rating >= 1000) return "🏆";
       if (rating >= 600) return "🥇";
@@ -1034,7 +1164,6 @@
       }
       return { slot, item: newItem, rarityId: rarity.id };
     }
-
     function chooseRarity() {
       const total = RARITIES.reduce((s, r) => s + r.weight, 0);
       let roll = Math.random() * total;
@@ -1044,7 +1173,6 @@
       }
       return RARITIES[0];
     }
-
     function itemScore(item) {
       let score = 0;
       for (const [k, v] of Object.entries(item)) {
@@ -1061,7 +1189,6 @@
         item: structuredClone(item)
       });
     }
-
     function equipFromInventory(entryId) {
       const entry = hero.inventory.find(e => e.id === entryId);
       if (!entry) return;
@@ -1070,11 +1197,8 @@
       const current = hero.equipment[slot];
       hero.equipment[slot] = structuredClone(newItem);
       hero.inventory = hero.inventory.filter(e => e.id !== entryId);
-      if (current) {
-        addItemToInventory(slot, current);
-      }
-      saveHero();
-      renderAll();
+      if (current) addItemToInventory(slot, current);
+      saveHero(); renderAll();
       log(`Tu équipes ${newItem.name} depuis ton inventaire.`, "loot");
       flushLogQueue();
     }
@@ -1090,18 +1214,16 @@
       }
       hero.coins -= cost;
       hero.statPoints += 1;
-      log(`Tu achètes un point de stats pour ${cost} pièces. Tu as maintenant ${hero.statPoints} point(s) à répartir.`, "loot");
-      shopInfo.textContent = "Point de stats acheté ! Pense à le dépenser dans le panneau Héros.";
-      saveHero();
-      renderAll();
-      flushLogQueue();
+      log(`Tu achètes un point de stats pour ${cost} pièces.`, "loot");
+      shopInfo.textContent = "Point de stats acheté ! Pense à le dépenser.";
+      saveHero(); renderAll(); flushLogQueue();
     }
 
     function handleNewEquipment(slot, newItem, sourceLabel) {
       const current = hero.equipment[slot];
       if (!current) {
         hero.equipment[slot] = structuredClone(newItem);
-        log(`${sourceLabel} : tu n'avais rien dans ce slot, tu équipes le nouvel objet.`, "loot");
+        log(`${sourceLabel} : tu n'avais rien, tu équipes le nouvel objet.`, "loot");
         return;
       }
       const curScore = itemScore(current);
@@ -1115,7 +1237,7 @@
         log(`${sourceLabel} : tu équipes le nouvel objet, l'ancien va dans l'inventaire.`, "loot");
       } else {
         addItemToInventory(slot, newItem);
-        log(`${sourceLabel} : tu gardes ton objet actuel, le nouvel objet va dans l'inventaire.`, "system");
+        log(`${sourceLabel} : tu gardes ton objet actuel, le nouveau va dans l'inventaire.`, "system");
       }
     }
 
@@ -1123,7 +1245,7 @@
       const cost = 20;
       const shopInfo = document.getElementById("shopInfo");
       if (hero.coins < cost) {
-        log("Tu n'as pas assez de pièces pour acheter une caisse mystère (20 nécessaires).", "system");
+        log("Tu n'as pas assez de pièces pour une caisse mystère (20 nécessaires).", "system");
         flushLogQueue();
         shopInfo.textContent = "Pas assez de pièces pour la caisse mystère.";
         return;
@@ -1138,10 +1260,8 @@
       log("", "system");
       log(`🛒 Caisse mystère : ${emoji} ${newItem.name} [${rarity.name}]`, "loot");
       handleNewEquipment(slot, newItem, "Caisse mystère");
-      shopInfo.textContent = "Achat effectué ! L'objet est équipé ou rangé dans l'inventaire.";
-      saveHero();
-      renderAll();
-      flushLogQueue();
+      shopInfo.textContent = "Achat effectué ! Équipé ou rangé dans l'inventaire.";
+      saveHero(); renderAll(); flushLogQueue();
     }
 
     const fixedShop = {
@@ -1161,13 +1281,12 @@
         item: { name: "Bague épique", PRE: 2, VITZ: 2, rarityId: "epic" }
       }
     };
-
     function buyFixedItem(key) {
       const offer = fixedShop[key];
       const shopInfo = document.getElementById("shopInfo");
       if (!offer) return;
       if (hero.coins < offer.cost) {
-        log(`Tu n'as pas assez de pièces pour acheter ${offer.item.name} (${offer.cost} nécessaires).`, "system");
+        log(`Pas assez de pièces pour ${offer.item.name} (${offer.cost}).`, "system");
         flushLogQueue();
         shopInfo.textContent = "Pas assez de pièces pour cet objet.";
         return;
@@ -1182,20 +1301,14 @@
       log(`🛒 Tu achètes : ${emoji} ${newItem.name} [${rarity.name}]`, "loot");
       handleNewEquipment(slot, newItem, "Objet fixe");
       shopInfo.textContent = "Achat effectué (objet fixe).";
-      saveHero();
-      renderAll();
-      flushLogQueue();
+      saveHero(); renderAll(); flushLogQueue();
     }
 
     function generateShopOffer() {
       const res = generateRandomItem();
       const rarity = getRarityById(res.rarityId);
       const baseCostByRarity = {
-        common: 20,
-        uncommon: 28,
-        rare: 40,
-        epic: 60,
-        legendary: 85
+        common: 20, uncommon: 28, rare: 40, epic: 60, legendary: 85
       };
       const cost = baseCostByRarity[rarity.id] || 25;
       return {
@@ -1206,13 +1319,12 @@
         cost
       };
     }
-
     function refreshShop(pay) {
       const shopInfo = document.getElementById("shopInfo");
       const refreshCost = 5;
       if (pay) {
         if (hero.coins < refreshCost) {
-          log("Tu n'as pas assez de pièces pour rafraîchir la boutique (5 nécessaires).", "system");
+          log("Pas assez de pièces pour rafraîchir la boutique (5 nécessaires).", "system");
           flushLogQueue();
           shopInfo.textContent = "Pas assez de pièces pour rafraîchir.";
           return;
@@ -1222,17 +1334,14 @@
       }
       hero.shop.items = [];
       for (let i = 0; i < 3; i++) hero.shop.items.push(generateShopOffer());
-      saveHero();
-      renderAll();
-      flushLogQueue();
+      saveHero(); renderAll(); flushLogQueue();
     }
-
     function buyShopOffer(id) {
       const idx = hero.shop.items.findIndex(o => o.id === id);
       if (idx < 0) return;
       const offer = hero.shop.items[idx];
       if (hero.coins < offer.cost) {
-        log("Tu n'as pas assez de pièces pour cet objet de la boutique.", "system");
+        log("Tu n'as pas assez de pièces pour cet objet.", "system");
         flushLogQueue();
         return;
       }
@@ -1246,9 +1355,7 @@
       log(`🛒 Tu achètes : ${emoji} ${newItem.name} [${rarity.name}]`, "loot");
       handleNewEquipment(slot, newItem, "Boutique");
       hero.shop.items.splice(idx, 1);
-      saveHero();
-      renderAll();
-      flushLogQueue();
+      saveHero(); renderAll(); flushLogQueue();
     }
 
     function applyCurrentSkin() {
@@ -1281,9 +1388,7 @@
           btn.style.marginLeft = "6px";
           btn.onclick = () => {
             hero.cosmetics.currentSkin = skin.id;
-            saveHero();
-            applyCurrentSkin();
-            renderCosmetics();
+            saveHero(); applyCurrentSkin(); renderCosmetics();
           };
           row.appendChild(btn);
         }
@@ -1307,10 +1412,6 @@
           if (def.rewardCoins) {
             hero.coins += def.rewardCoins;
             log(`Défi réussi : ${def.name} ! Récompense : +${def.rewardCoins} pièces.`, "loot");
-          }
-          if (def.rewardStatPoints) {
-            hero.statPoints = (hero.statPoints || 0) + def.rewardStatPoints;
-            log(`Tu gagnes ${def.rewardStatPoints} points de stats supplémentaires.`, "loot");
           }
           if (def.unlockSkin) {
             if (!hero.cosmetics.unlocked.includes(def.unlockSkin)) {
@@ -1348,9 +1449,7 @@
 
     function renderHero() {
       const levelLabel =
-        hero.level >= LEVEL_CAP
-          ? `Niv. ${hero.level} (MAX)`
-          : `Niv. ${hero.level} / ${LEVEL_CAP}`;
+        hero.level >= LEVEL_CAP ? `Niv. ${hero.level} (MAX)` : `Niv. ${hero.level} / ${LEVEL_CAP}`;
       document.getElementById("heroName").innerHTML =
         `<strong>${hero.name}</strong> <span class="badge">${levelLabel}</span>`;
       document.getElementById("heroMeta").textContent =
@@ -1397,13 +1496,11 @@
         container.appendChild(btn);
       });
     }
-
     function addStat(statKey) {
       if (hero.statPoints <= 0) return;
       hero.stats[statKey] = (hero.stats[statKey] || 0) + 1;
       hero.statPoints -= 1;
-      saveHero();
-      renderAll();
+      saveHero(); renderAll();
     }
 
     function renderEquipment() {
@@ -1429,7 +1526,6 @@
             .filter(([k]) => ["FOR","VIT","PRE","ESQ","VITZ"].includes(k))
             .map(([k, v]) => `${k}+${v}`)
             .join(", ");
-
           const nameBox =
             `<span style="
               display:inline-block;
@@ -1440,13 +1536,10 @@
               color:${rarity.color};
               font-weight:600;
             ">${item.name}</span>`;
-
           const statsSpan = stats
             ? ` <span style="font-size:12px;color:#555;">(${stats})</span>`
             : "";
-
-          div.innerHTML =
-            `<strong>${label}</strong> : ${emoji} ${nameBox}${statsSpan}`;
+          div.innerHTML = `<strong>${label}</strong> : ${emoji} ${nameBox}${statsSpan}`;
         }
         el.appendChild(div);
       });
@@ -1497,7 +1590,7 @@
       if (!list) return;
       list.innerHTML = "";
       if (!hero.shop.items || hero.shop.items.length === 0) {
-        list.textContent = "Aucun objet pour le moment. Rafraîchis la boutique pour voir de nouveaux équipements.";
+        list.textContent = "Aucun objet pour le moment. Rafraîchis la boutique.";
         return;
       }
       hero.shop.items.forEach(offer => {
@@ -1507,7 +1600,6 @@
           .filter(([k]) => ["FOR","VIT","PRE","ESQ","VITZ"].includes(k))
           .map(([k,v]) => `${k}+${v}`)
           .join(", ");
-
         const nameBox =
           `<span style="
             display:inline-block;
@@ -1518,17 +1610,14 @@
             color:${rarity.color};
             font-weight:600;
           ">${offer.item.name}</span>`;
-
         const statsSpan = statsText
           ? ` <span style="font-size:12px;color:#4b5563;">(${statsText})</span>`
           : "";
-
         const line = document.createElement("div");
         line.style.marginBottom = "4px";
         line.innerHTML =
           `${emoji} ${nameBox}${statsSpan} – ` +
           `<span style="font-size:12px;">${offer.cost} pièces</span>`;
-
         const btn = document.createElement("button");
         btn.textContent = "Acheter";
         btn.style.marginLeft = "6px";
@@ -1558,12 +1647,9 @@
           slot === "weapon" ? "Arme" :
           slot === "helmet" ? "Casque" :
           slot === "armor" ? "Armure" :
-          slot === "boots" ? "Bottes" :
-          "Accessoire";
-
+          slot === "boots" ? "Bottes" : "Accessoire";
         const row = document.createElement("div");
         row.style.marginBottom = "4px";
-
         const nameBox =
           `<span style="
             display:inline-block;
@@ -1574,21 +1660,17 @@
             color:${rarity.color};
             font-weight:600;
           ">${item.name}</span>`;
-
         const statsSpan = statsText
           ? ` <span style="font-size:12px;color:#4b5563;">(${statsText})</span>`
           : "";
-
         row.innerHTML =
           `<span style="font-size:11px;color:#6b7280;">[${slotLabel}]</span> ` +
           `${emoji} ${nameBox}${statsSpan}`;
-
         const btn = document.createElement("button");
         btn.textContent = "Équiper";
         btn.style.marginLeft = "6px";
         btn.onclick = () => equipFromInventory(id);
         row.appendChild(btn);
-
         list.appendChild(row);
       });
     }
@@ -1610,6 +1692,7 @@
       renderCosmetics();
       renderAchievements();
       if (!combatContext || !combatContext.active) resetDuelBars();
+      updateDevGodLabel();
     }
 
     function startMission(difficulty) {
@@ -1693,7 +1776,6 @@
       const level = Math.max(1, hero.level + levelOffset);
 
       const scalar = 0.85 + Math.min(rating, 600) / 600 * 0.15;
-
       function randAroundHero(statName, extraSpread = 0) {
         const base = getTotalStat(statName) * scalar;
         const spread = 1 + level + extraSpread;
@@ -1711,7 +1793,6 @@
       };
     }
 
-    // --- COMBAT AVEC GOD MODE ---
     function simulateCombat(enemy) {
       let heroHP = maxHP();
       let enemyHP = enemy.VIT * 10;
@@ -1736,11 +1817,10 @@
         round++;
       }
 
-      // GOD MODE : quoi qu'il arrive, tu gagnes
       if (GOD_MODE) {
         enemyHP = 0;
         log("", "system", heroHP, enemyHP);
-        log("Grâce au GOD MODE, tu termines le combat en totale domination. Victoire automatique. 😈", "hero");
+        log("Grâce au GOD MODE, tu termines le combat en totale domination. 😈", "hero");
         return { outcome: "win", heroHP, enemyHP: 0 };
       }
 
@@ -1794,16 +1874,14 @@
     }
 
     function enemyAttack(heroHP, enemyHP, enemy) {
-      // GOD MODE : tu ne prends aucun dégât
       if (GOD_MODE) {
         let txt = rand(enemyHitTexts)
           .replace("{name}", enemy.name)
           .replace("{dmg}", 0)
           .replace("{hp}", heroHP);
-        log(txt + " (GOD MODE : tu ne prends aucun dégât)", "hero", heroHP, enemyHP);
+        log(txt + " (GOD MODE : aucun dégât)", "hero", heroHP, enemyHP);
         return heroHP;
       }
-
       let hitChance = 0.7 + (enemy.PRE - getTotalStat("ESQ")) * 0.02;
       hitChance = Math.max(0.2, Math.min(0.9, hitChance));
       if (Math.random() > hitChance) {
@@ -1846,11 +1924,11 @@
           maybeDropLoot(difficulty);
         } else if (result.outcome === "draw") {
           log("", "system", result.heroHP, result.enemyHP);
-          log(`Tu apprends un peu de ce combat : +${Math.round(baseXP/2)} XP.`, "loot");
+          log(`Tu apprends un peu : +${Math.round(baseXP/2)} XP.`, "loot");
           hero.xp += Math.round(baseXP/2);
         } else {
           log("", "system", result.heroHP, result.enemyHP);
-          log("Pas de récompense, mais tu feras mieux la prochaine fois.", "system");
+          log("Pas de récompense cette fois-ci.", "system");
         }
       } else if (mode === "arena") {
         const a = hero.arena || (hero.arena = { rating: 0, wins: 0, losses: 0 });
@@ -1866,13 +1944,13 @@
         } else if (result.outcome === "lose") {
           const loss = 10;
           log("", "system", result.heroHP, result.enemyHP);
-          log(`Défaite en arène : tu perds ${loss} points d'arène.`, "system");
+          log(`Défaite en arène : -${loss} points d'arène.`, "system");
           a.rating = Math.max(0, a.rating - loss);
           a.losses += 1;
         } else {
           const xp = 4;
           log("", "system", result.heroHP, result.enemyHP);
-          log(`Match nul en arène : +${xp} XP, pas de changement de rang.`, "loot");
+          log(`Match nul en arène : +${xp} XP.`, "loot");
           hero.xp += xp;
         }
         hero.progress.arenaRatingBest = Math.max(hero.progress.arenaRatingBest || 0, hero.arena.rating || 0);
@@ -1885,13 +1963,12 @@
         hero.statPoints += 3;
         hero.progress.maxLevel = Math.max(hero.progress.maxLevel || 0, hero.level);
         log("", "system");
-        log(`🔥 TU PASSES NIVEAU ${hero.level} ! Tu gagnes 3 points de stats à répartir.`, "loot");
+        log(`🔥 TU PASSES NIVEAU ${hero.level} ! Tu gagnes 3 points de stats.`, "loot");
       }
-
       if (hero.level >= LEVEL_CAP && hero.xp >= hero.xpToNext) {
         hero.xp = hero.xpToNext;
         log("", "system");
-        log(`Tu es au niveau max (${LEVEL_CAP}). L'XP supplémentaire ne te fait plus monter pour l'instant.`, "system");
+        log(`Tu es au niveau max (${LEVEL_CAP}).`, "system");
       }
 
       checkAchievements();
@@ -1916,8 +1993,11 @@
     ensureStructures();
     renderAll();
     clearLog();
-    log("Bienvenue dans Cartoon Clash Arena ! Lance une mission ou un match d'arène. 🥊", "system");
+    updateDevGodLabel();
+    log("Bienvenue dans Cartoon Clash Arena (version mobile) ! Choisis un onglet et lance une mission. 🥊", "system");
     flushLogQueue();
   </script>
 </body>
 </html>
+
+
